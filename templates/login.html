@@ -1,0 +1,33 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Login Page
+{% endblock %}
+
+{% block content %}
+<div>
+
+  <h1 style="text-align: center;">A to Z Household Services</h1>
+
+  <form class="input_form" action="/" method='POST']>
+
+    <div class="err_pop">{{msg}}</div>
+    
+    <div class="mb-3">
+      <label for="email" class="form-label">Registered Email ID:</label>
+      <input type="email" class="form-control" name="email" id="email"  required>
+       
+    </div>
+    <div class="mb-3">
+      <label for="password" class="form-label">Password</label>
+      <input type="password" class="form-control" name="password" id="password" required>
+    </div>
+     
+    <button type="submit" class="btn btn-primary">Login</button>
+    <div><a href="/signup">Create Account?</a>  ||or||  <a href="/professional_signup">Register As Professional</a></div>
+  </form>
+
+</div>
+  
+ 
+{% endblock %}

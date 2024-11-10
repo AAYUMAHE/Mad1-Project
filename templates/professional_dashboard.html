@@ -1,0 +1,131 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+             Professioanl
+          {% endblock %}  
+
+{% include 'navbar.html' %}
+
+ {% block content %} 
+ <div style="text-align: right; margin:auto;"><a href="#">Profile details</a></div>
+ <div style="text-align: right;"><a href="#">View/Edit</a></div>
+  
+ 
+ <!-- Services  -->
+
+ <div class="container">
+  <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Today Services</h3>
+</div>
+
+
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Service Name</th>
+      <th scope="col">Base Price</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Jacob</td>
+      <td>Thornton</td>
+      <td>@fat</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td colspan="2">Larry the Bird</td>
+      <td>@twitter</td>
+    </tr>
+  </tbody>
+</table>
+
+<!-- Closed Services -->
+
+<div class="container">
+  <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Closed Services</h3>
+</div>
+
+
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Service Name</th>
+      <th scope="col">Base Price</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Jacob</td>
+      <td>Thornton</td>
+      <td>@fat</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td colspan="2">Larry the Bird</td>
+      <td>@twitter</td>
+    </tr>
+  </tbody>
+</table>
+
+
+<!-- Service Requests -->
+
+<div class="container">
+  <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Service Requests</h3>
+</div>
+
+
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Service Name</th>
+      <th scope="col">Base Price</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">1</th>
+      <td>Mark</td>
+      <td>Otto</td>
+      <td>@mdo</td>
+    </tr>
+    <tr>
+      <th scope="row">2</th>
+      <td>Jacob</td>
+      <td>Thornton</td>
+      <td>@fat</td>
+    </tr>
+    <tr>
+      <th scope="row">3</th>
+      <td colspan="2">Larry the Bird</td>
+      <td>@twitter</td>
+    </tr>
+  </tbody>
+</table>
+
+
+   
+ {% endblock %}
