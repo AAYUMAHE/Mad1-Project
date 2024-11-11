@@ -5,32 +5,58 @@
              Customer
           {% endblock %}  
 
-{% include 'navbar.html' %}    
-<!-- including navbar -->
+ {% include 'navbar.html' %}
 
 {% block content %} 
- 
 
-<table class="table table-bordered">
-  <thead>
-    <tr>
-      <th scope="col">ID</th>
-      <th scope="col">Service Name</th>
-      <th scope="col">Base Price</th>
-      <th scope="col">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for service in services %}
-    
-    <tr>
-      <th scope="row">{{service.id}}</th>
-      <td>{{service.name}}</td>
-      <td>{{service.base_price}}</td>
-      <td>Edit,Del,Update</td>
-    </tr>
-    {% endfor %}
+
+
+
+<div> 
+  <div><h1 class="display-1 fs-1 text center">{{header_msg}}</h1></div>
+  <div class=" d-flex justify-content-evenly" style="margin-top: 70px;">
      
-  </tbody>
-</table>
+    <!-- id is current user id -->
+  {% for category in categories %}
+    <div class="card" style="width: 12rem;">
+       
+      <a href="/{{category.name}}/services/{{id}}/{{user}}"><img src="/static/images/{{category.name}}.png" class="card-img-top" ></a> 
+      <div class="card-body">
+        <p class="card-text"> {{category.name}} Services </p>
+      </div>
+    </div>
+  {% endfor %}
+     
+
+
+    {% if services %}
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Service Name</th>
+          <th scope="col">Base Price</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for service in services %}
+        
+        <tr>
+          <th scope="row">{{service.id}}</th>
+          <td>{{service.name}}</td>
+          <td>{{service.base_price}}</td>
+           
+        {% endfor %}
+         
+      </tbody>
+    </table>
+    {% endif %}
+  </div>
+</div>  
+
+
+
+
+
 {% endblock %}

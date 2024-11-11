@@ -16,10 +16,14 @@ def get_category():
     categories = Category.query.all()
     return categories  #give list
 
-#services by id.
+#services by id. it is not giving all sevices by cat id , pls be careful.
 def get_service_by_id(service_id):
     service = Services.query.filter_by(id=service_id).first()   #give 1st ele of list services. in which id matched.
     return service
+def get_all_services_by_cid(id):
+    # id is cid in service table
+    services = Services.query.filter_by(c_id = id).all()  #will gie list of services belongs to cid.
+    return services
 
 #functions for search
 def search_by_service_name(service_name):
@@ -77,7 +81,7 @@ def login():
             # return render_template("admin.html",user=uname,services=get_service())  
               #it will redirect to new route . #router func or jinja var in admin.html
         elif usr and usr.role == 1:
-            return render_template('customer.html',user = uname)
+            return  redirect(url_for('customer_dashboard',user=uname))
         else:
             return render_template('login.html',msg="Invalid Credentials")
     return render_template('login.html')
@@ -93,6 +97,12 @@ def admin_dashboard(user):
     return render_template('admin.html',user=user,services= get_service())   
     #yaha services explicitly mention krna pada kyu ki upr vala router mein only name hain.
 
+@app.route('/customer/<user>' , methods=['GET','POST'])
+def customer_dashboard(user):
+    user_id = User.query.filter_by(email=user).first().id    #tells id for a customer as required in jinja.
+    categories= get_category()
+    # print('Customer Dashboard',categories[1].name,categories[2].name )
+    return render_template('customer.html' ,user=user,categories=categories,id= user_id, header_msg='Looking For?' )
 
 #route for add service
 @app.route('/admin/add_service',methods=['GET','POST'])
@@ -178,3 +188,17 @@ def search(user):
         
     # print("GET request received")    
     return redirect(url_for('admin_dashboard',user = user))
+
+
+#if role=1 , username is given when login , but we need user id in customer table.
+# <category> is a category.name
+# we need services related to a particular category
+@app.route('/<category>/services/<id>/<user>')
+# here id is not cid , here id is uid.
+def customer_view(category,id,user):
+    cid = Category.query.filter_by(name=category).first().id   #we only have one record of unique category , so first. if all then messy.
+    services = get_all_services_by_cid(cid)   #list of all services related to cid or id.
+    return render_template('customer.html',services=services,user=user,category=category,header_msg='Book the service you would like to have !')
+#important lesson , jitne attribute def func mein hoo , utne saare use hone chaye , other vise error.
+
+     

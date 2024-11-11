@@ -48,12 +48,13 @@ class Services(db.Model):
 
 class Running(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    u_id = db.Column(db.Integer, db.ForeignKey('user.id') , unique=True)
+    u_id = db.Column(db.Integer, db.ForeignKey('user.id') , unique=True, nullable= False)
     s_id = db.Column(db.Integer, db.ForeignKey('services.id') , nullable=False)
     p_id = db.Column(db.Integer, db.ForeignKey('professional.id'))
     c_id = db.Column(db.Integer, db.ForeignKey('category.id') , nullable=False)
-    date_created = db.Column(db.DateTime, nullable=False)
-    date_closed = db.Column(db.DateTime, nullable=True)
+    date_time_created = db.Column(db.DateTime, nullable=False)
+    date_time_closed = db.Column(db.DateTime, nullable=True)
+    ratings = db.Column(db.String(64), nullable=False, default=0)
     status = db.Column(db.String(64), nullable=False, default='pending')
 
     # customer = db.relationship("User" , backref='service' ,cascade = "all,delete" ,lazy = True)
