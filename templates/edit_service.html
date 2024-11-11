@@ -20,8 +20,9 @@
  <!-- idea is he is able to change the categoris also , and we set value in option tag , but by default option value is ours  -->
      
     {% for category in categories %}
-    <option value={{service.category.id}}>{{category.name}}</option>
+    <option value={{service.category.name}}>Id-{{category.id}}  {{category.name}}</option>
     {% endfor %}
+    <!-- if i used service.category.id it throws error of none type , bcz id and name are diff  -->
 
   </select>
   </div>

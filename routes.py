@@ -9,17 +9,29 @@ from models import *
 #services import
 def get_service():
     services = Services.query.all()  #it will give a list of all services available, like S1,S2...
-    return services
+    return services  #give list
 
 # category import
 def get_category():
     categories = Category.query.all()
-    return categories
+    return categories  #give list
 
 #services by id.
 def get_service_by_id(service_id):
     service = Services.query.filter_by(id=service_id).first()   #give 1st ele of list services. in which id matched.
     return service
+
+#functions for search
+def search_by_service_name(service_name):
+    by_services = Services.query.filter(Services.name.ilike(f"%{service_name}%")).all()
+    return by_services  #return a list as .all
+def search_by_service_description(service_description):
+    by_services_description = Services.query.filter(Services.description.ilike(f"%{service_description}%")).all()
+    return by_services_description
+def search_by_category(category_name):
+    by_category = Category.query.filter(Category.name.ilike(f"%{category_name}%")).all()
+    return by_category  #return a list as .all
+
 
 # services = get_service()[0].name    it will only work if services are there if no services are it will throgh out of range error.
 # print(services)
@@ -61,7 +73,7 @@ def login():
         pwd = request.form.get('password')
         usr = User.query.filter_by(email = uname , password = pwd ).first()
         if usr  and usr.role == 0:
-            return redirect(url_for('admin_dashboard',user=uname,services=get_service() ))
+            return redirect(url_for('admin_dashboard',user=uname))
             # return render_template("admin.html",user=uname,services=get_service())  
               #it will redirect to new route . #router func or jinja var in admin.html
         elif usr and usr.role == 1:
@@ -118,18 +130,21 @@ def edit_service(id,user):
     service = get_service_by_id(id)
     if request.method == 'POST':
         category = request.form.get('category')   #string
-        print(category)
+        
         name = request.form.get('name')            
         base_price = request.form.get('base_price')
         description = request.form.get('description')
         c_id = Category.query.filter_by(name=category).first()
         #cid.id means id for category name
-        service.c_id = c_id.id
-        service.name = name
-        service.base_price = base_price
-        service.description = description
-        db.session.commit()
-        return redirect(url_for(admin_dashboard(user=user)))
+        if c_id:
+            service.c_id = c_id.id
+            service.name = name
+            service.base_price = base_price
+            service.description = description
+            db.session.commit()
+            return redirect(url_for('admin_dashboard',user=user))
+    
+        return render_template('edit_service.html',service=service,user=user,categories=get_category(),msg='Category Not Found')
     
     return render_template('edit_service.html',service=service,user=user,categories = get_category())
 
@@ -139,10 +154,27 @@ def edit_service(id,user):
 def delete_service(id,user):
     service = get_service_by_id(id)
     if request.method == 'POST':
-         
         db.session.delete(service)
         db.session.commit()
-        return redirect(url_for(admin_dashboard(user=user,msg='Service deleted Successfully')))
+        return redirect(url_for('admin_dashboard',user=user))
     return render_template('delete_service.html',service=service,user=user)
 #here category render is not req as we are deleting.
     
+
+    #search fuctionality on services on admin dashboard.
+@app.route('/search/<user>' , methods = ['GET','POST'])
+def search(user):
+    if request.method == 'POST':
+        # print("POST request received")
+        search_txt = request.form.get('search_txt')
+        by_services = search_by_service_name(search_txt)   #return a list of objects.
+        by_services_description = search_by_service_description(search_txt)   #return a list of objects.
+        if by_services:
+            return render_template('admin.html',user=user,services = by_services)
+        elif by_services_description:
+            return render_template('admin.html',user=user,services = by_services_description)
+        else:
+            return render_template('admin.html',user=user, msg='No Service Found')
+        
+    # print("GET request received")    
+    return redirect(url_for('admin_dashboard',user = user))

@@ -14,25 +14,25 @@
 Are You Sure You Want to Delete.
  
 
-<form  style="margin-top:40px;"  action="/edit_service/{{service.id}}/{{user}}" method="POST">
+<form  style="margin-top:40px;"  action="/delete_service/{{service.id}}/{{user}}" method="POST">
   <div class="mb-3">
     <label for="name" class="form-label">Category</label>
-    <input type="text" class="form-control" name="name" id="name" value={{service.category.name}} required>
+    <input type="text" class="form-control" name="name" id="name" value={{service.category.name}} readonly required>
   </div>
   <div class="mb-3">
     <label for="name" class="form-label">Name</label>
-    <input type="text" class="form-control" name="name" id="name" value={{service.name}} required>
+    <input type="text" class="form-control" name="name" id="name" value={{service.name}} readonly required>
   </div>
   <div class="mb-3">
     <label for="base_price" class="form-label">Base Price</label>
-    <input type="number" class="form-control" name="base_price" value={{service.base_price}} id="base_price" required>
+    <input type="number" class="form-control" name="base_price" value={{service.base_price}} id="base_price" readonly required>
   </div>
   <div class="mb-3">
      
     <label class="form-label" for="description">Description</label>
-    <input type="text"  class="form-control" name="description" id="description" value={{service.description}} required>
+    <input type="text"  class="form-control" name="description" id="description" value={{service.description}} readonly required>
   </div>
-  <button type="submit" class="btn btn-primary">Delete</button>
+  <button type="submit" class="btn btn-danger">Delete</button>
    
   <a href="/admin/{{user}}"><button type="button">cancel</button></a>
 </form>
