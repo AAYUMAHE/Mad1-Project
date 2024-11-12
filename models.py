@@ -12,12 +12,14 @@ class User(db.Model):
     address = db.Column(db.String(64), nullable=False)
     pincode = db.Column(db.Integer , nullable=False)
     role = db.Column(db.Boolean, nullable=False, default=1)
+    running = db.relationship("Running", backref = 'user',cascade = "all,delete",lazy = True)
 
   # consider username as email  
 class Category(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(64), nullable=False)  
     services = db.relationship("Services", backref = 'category',cascade = "all,delete" ,lazy = True)
+    running = db.relationship("Running", backref = 'category',cascade = "all,delete",lazy = True)
 
 
 class Professional(db.Model):
@@ -34,8 +36,10 @@ class Professional(db.Model):
     address = db.Column(db.String(64), nullable=False)
     experience = db.Column(db.String(64), nullable=False)
     pincode = db.Column(db.Integer , nullable=False)
+    rating = db.Column(db.String(10), default = 'New Professional')
     status = db.Column(db.Integer , nullable=False)
     #status code 0 when applied , 1 when accepted , 2 when blocked .
+    running = db.relationship("Running", backref = 'professional',cascade = "all,delete",lazy = True)
 
 
 
@@ -46,12 +50,13 @@ class Services(db.Model):
     base_price = db.Column(db.Integer , nullable=False)
     description = db.Column(db.String(64), nullable=False)
     professional = db.relationship("Professional", backref = 'services',cascade = "all,delete",lazy = True)
+    running = db.relationship("Running", backref = 'services',cascade = "all,delete",lazy = True)
 
      
 
 class Running(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    u_id = db.Column(db.Integer, db.ForeignKey('user.id') , unique=True, nullable= False)
+    u_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable= False)  #it must be not unique as we store all data , back or present.
     s_id = db.Column(db.Integer, db.ForeignKey('services.id') , nullable=False)
     p_id = db.Column(db.Integer, db.ForeignKey('professional.id'),default='Null')
     c_id = db.Column(db.Integer, db.ForeignKey('category.id') , nullable=False)
@@ -59,6 +64,7 @@ class Running(db.Model):
     date_time_closed = db.Column(db.DateTime, nullable=True)
     ratings = db.Column(db.String(64), nullable=False, default=0)
     status = db.Column(db.String(64), nullable=False, default='pending')
+    remarks = db.Column(db.String(64), default=None)
 
     # customer = db.relationship("User" , backref='service' ,cascade = "all,delete" ,lazy = True)
     # professional = db.relationship()

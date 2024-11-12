@@ -1,0 +1,38 @@
+{% extends 'layout.html' %}   
+<!-- inheritence -->
+
+{% block title %}
+             Customer
+          {% endblock %}  
+
+ {% include 'navbar_customer.html' %}
+
+{% block content %} 
+
+<div style="margin-top: 40px;">
+  <table class="table table-bordered">
+    <thead>
+      <tr>
+        <th scope="col">ID</th>
+        <th scope="col">Service Name</th>
+        <th scope="col">Base Price</th>
+        <th scope="col">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% if services %}
+      {% for service in services %}
+      <tr>
+        <th scope="row">{{service.id}}</th>
+        <td>{{service.services.name}}</td>
+        <td>{{service.professional.name}}</td>
+        <td>{{service.status}}</td>
+      </tr>
+      {% endfor %}
+      <!-- {% else %} -->
+       
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

@@ -4,13 +4,16 @@
 {% block title %}
              Admin
           {% endblock %} 
+ {% include 'navbar_customer.html' %}         
 
 <div class="err_pop">{{msg}}</div>          
 
 {% block content %}
 <div>
+  {%if service%}
   <h1>Confirm your Booking {{user}}</h1>
   <form class="input_form" action="/book/{{user}}/{{id}}/service/{{service.id}}" method="POST" >
+     
     <div class="mb-3">
       <label for="name" class="form-label">Name</label>
       <input type="text" class="form-control" name="name" id="name" value={{service.name}} readonly>
@@ -24,6 +27,9 @@
       <button type="submit" class="btn btn-success">Confirm</button>
     </div>
   </form>
+  {% else %}
+  <h1>{{msg}}</h1>
+  {% endif %}
 </div>
 
 

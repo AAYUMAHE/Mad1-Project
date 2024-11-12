@@ -5,10 +5,6 @@ from datetime import datetime
 import pytz
 
 
-# @app.route('/login')
-# def login():
-#     return render_template('login.html')
-
 #services import
 def get_service():
     services = Services.query.all()  #it will give a list of all services available, like S1,S2...
@@ -18,6 +14,10 @@ def get_service():
 def get_category():
     categories = Category.query.all()
     return categories  #give list
+#professionals import
+def get_professional():
+    professionals = Professional.query.all()
+    return professionals  #give list
 
 #services by id. it is not giving all sevices by cat id , pls be careful.
 def get_service_by_id(service_id):
@@ -26,6 +26,12 @@ def get_service_by_id(service_id):
 def get_all_services_by_cid(id):
     # id is cid in service table
     services = Services.query.filter_by(c_id = id).all()  #will gie list of services belongs to cid.
+    return services
+
+#all services by customer
+def get_all_services_by_customer(customer_id):
+    services = Running.query.filter_by(u_id = customer_id).all()  #will give list of obj services u_id is user id.
+    #customer is user. 
     return services
 
 #functions for search
@@ -82,6 +88,7 @@ def login():
         pwd = request.form.get('password')
         usr = User.query.filter_by(email = uname , password = pwd ).first()
         professional = Professional.query.filter_by(email=uname).first()
+        #tell professional name
         if usr  and usr.role == 0:
             return redirect(url_for('admin_dashboard',user=uname))
             # return render_template("admin.html",user=uname,services=get_service())  
@@ -89,7 +96,8 @@ def login():
         elif usr and usr.role == 1:
             return  redirect(url_for('customer_dashboard',user=uname))
         elif professional and professional.status == 1:
-            return redirect(url_for('professional_dashboard',user=uname))
+            return redirect(url_for('professional_dashboard',user=professional.name))
+            #professional.name is better in elif if professional is none , we saved by error.
         elif professional and professional.status == 0:
             return render_template('login.html',msg="Your Account is Under Verification")
         elif professional and professional.status == 2:
@@ -107,8 +115,44 @@ def login():
 # #Common Route for admin , name is the admin email or username.
 @app.route('/admin/<user>' , methods=['GET','POST'])
 def admin_dashboard(user):
-    return render_template('admin.html',user=user,services= get_service())   
+    return render_template('admin.html',user=user,services= get_service(),professionals = get_professional())   
     #yaha services explicitly mention krna pada kyu ki upr vala router mein only name hain.
+
+#admin professional
+# pid is professional id 
+@app.route('/admin/professional/manage/<pid>/<user>/<value>',methods = ['GET','POST'])
+# value is Approve or Block kinda constant.
+def manage_professional(pid,user,value):
+    value = value
+    professional = Professional.query.filter_by(id=pid).first()   #the one who the pid belongs .
+    if request.method == 'POST' and value == 'Approve':
+        professional.status = 1
+        db.session.commit()
+        return redirect(url_for('admin_dashboard',user = user))
+    elif request.method == 'POST' and value == 'Block':
+        professional.status = 2
+        db.session.commit()
+        return redirect(url_for('admin_dashboard',user = user))
+    return render_template('warning.html',professional = professional, value=value, pid = pid , user=user)
+
+
+#user is already passed in admin file.
+@app.route('/admin/<user>/show/all_professionals')
+def show_all_professionals(user):
+    user = user
+    professionals = Professional.query.all()
+    return render_template('all_professionals.html',professionals = professionals,user=user)
+
+@app.route('/admin/<user>/<pid>/details')
+def show_professional_details(user,pid):
+    professional = Professional.query.filter_by(id = pid).first()  #professional object related to pid.
+    return render_template('particular_professional_details.html',professional = professional,user=user)
+
+
+
+
+
+
 
 @app.route('/customer/<user>' , methods=['GET','POST'])
 def customer_dashboard(user):
@@ -203,6 +247,10 @@ def search(user):
     return redirect(url_for('admin_dashboard',user = user))
 
 
+
+# ====================================customer stuff==============================
+
+
 #if role=1 , username is given when login , but we need user id in customer table.
 # <category> is a category.name
 # we need services related to a particular category
@@ -217,7 +265,13 @@ def customer_view(category,id,user):
      
 @app.route('/book/<user>/<uid>/service/<sid>',methods=['GET','POST'])
 def book_service(user,sid,uid):
+    service = Services.query.filter_by(id = sid).first()  # give 1st obj in list.
     if request.method=='POST':
+        already_service_status = Running.query.filter_by(u_id = uid, s_id = sid,status='pending').first()
+        #it will take care that if pending is there they can't book another.
+        if already_service_status :
+            return render_template('book_services.html',msg='You already booked one service kindly wait for acceptence',user=user,sid=sid,id=uid)
+            #all these sid, user are necessary , as navbar will need or nav bar some router.
         cid = Services.query.filter_by(id = sid).first().c_id
         # Set the current time in UTC+5:30 (Indian Standard Time)
         ist_timezone = pytz.timezone('Asia/Kolkata')   #indian standard time
@@ -226,12 +280,18 @@ def book_service(user,sid,uid):
         db.session.add(new_service_rq_added)
         db.session.commit()
         return redirect(url_for('customer_dashboard',user=user))
-    service = Services.query.filter_by(id = sid).first()  # give 1st obj in list.
+     
     return render_template('book_services.html',user=user,sid=sid,id=uid,service=service)
 
 
+@app.route('/customer/<uid>/<user>/services',methods=['GET','POST'])
+def all_customer_services(uid,user):
+    services = get_all_services_by_customer(uid)   #uid is customer id , cid we call category id , don't confuse.
+    return render_template('customer_services.html',services=services,user=user,id=uid)
 
 
+
+# ======================================Professional things =============================
 #professional signup.
 @app.route('/professional_signup' , methods=['GET','POST'])
 def professional_signup():
@@ -261,4 +321,8 @@ def professional_signup():
             return redirect(url_for('login' , msg="Registration Successful ,wait for admin to approve"))
         
     return render_template('p-signup.html',services = services)
+
+@app.route('/professional/<user>')
+def professional_dashboard(user):
+    return render_template('professional_dashboard.html',user=user)
 

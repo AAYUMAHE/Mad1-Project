@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}   
+<!-- inheritence -->
+
+{% block title %}
+             Warning 
+          {% endblock %}  
+
+{% include 'navbar.html' %}          
+
+{% block content %}   
+
+<div style="margin-top: 70px;"> 
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Professional Name</th>
+      <th scope="col">Service Name</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>  
+
+{% for professional in professionals %}
+{% if professional.status == 0 %}
+<tr>
+  <th scope="row"><a href="/admin/{{user}}/{{professional.id}}/details">{{professional.id}}</a></th>
+  <td>{{professional.name}}</td>
+  <td>{{professional.services.name}}</td>
+  <!-- professional.services from backref relation. -->
+  <td><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Approve" type="button" class="btn btn-success">Approve</a><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Block" type="button" class="btn btn-danger"> Block</a></td>
+</tr>
+{% elif professional.status == 1 %}
+
+<tr>
+  <th scope="row"><a href="/admin/{{user}}/{{professional.id}}/details">{{professional.id}}</a></th>
+  <td>{{professional.name}}</td>
+  <td>{{professional.services.name}}</td>
+  <!-- professional.services from backref relation. -->
+  <td><a href="#" type="button" class="btn btn-success">Approved</a><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Block" type="button" class="btn btn-danger"> Block</a></td>
+</tr>
+{% else %}
+<tr>
+  <!-- href directs to another path -->
+  <th scope="row"><a href="/admin/{{user}}/{{professional.id}}/details">{{professional.id}}</a></th>
+  <td>{{professional.name}}</td>
+  <td>{{professional.services.name}}</td>
+  <!-- professional.services from backref relation. -->
+  <td><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Approve" type="button" class="btn btn-success">Approve</a><a href="#" type="button" class="btn btn-danger"> Blocked</a></td>
+</tr>
+
+{% endif %}
+{% endfor %}
+  </tbody>
+</table>
+</div>
+{% endblock %}

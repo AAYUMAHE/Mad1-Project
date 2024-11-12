@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    SignUp
+{% endblock %}
+
+{% include 'navbar.html' %}
+
+{% block content %}
+
+{% if professional %}
+<div style="margin-top: 40px;"> 
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Professional Name</th>
+      <th scope="col">Service Name</th>
+      <th scope="col">Experience</th>
+      <th scope="col">Description</th>
+      <th scope="col">Category of Service</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th scope="row">{{professional.id}}</th>
+      <td>{{professional.name}}</td>
+      <td>{{professional.services.name}}</td>
+      <!-- professional.services from backref relation. -->
+      <td>{{professional.experience}}</td>
+      <td>{{professional.description}}</td>
+      <td>{{professional.services.category.name}}</td>
+    </tr>
+  </tbody>
+</table>
+<a href="/admin/{{user}}" type="button" class="btn btn-success">Ok</a>
+</div>
+{% endif %}
+{% endblock %}

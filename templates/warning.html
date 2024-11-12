@@ -1,0 +1,20 @@
+{% extends 'layout.html' %}   
+<!-- inheritence -->
+
+{% block title %}
+             Warning 
+          {% endblock %}  
+
+{% block content %}           
+ 
+<div class="err_pop">{{msg}}</div>
+<form class="input_form" action="/admin/professional/manage/{{pid}}/{{user}}/{{value}}" , method="POST">
+   <div class="mb-3">
+      <label for="name" class="form-label">Professional Name</label>
+      <input type="text" class="form-control" name="name" id="name" value={{professional.name}} readonly>
+    </div>
+    <!-- here professional is only passed instead of all professionals as we require one only -->
+   <button type="submit" class="btn btn-primary">{{value}}</button>  
+
+</form>
+{% endblock %}

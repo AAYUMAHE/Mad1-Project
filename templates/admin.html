@@ -19,9 +19,6 @@
   
 <h3 class="center" style="text-align:center; margin-top:40px; margin-bottom:40px;">Services</h3>
  
-
-
-
 <table class="table table-bordered">
   <thead>
     <tr>
@@ -44,7 +41,6 @@
      
   </tbody>
 </table>
-
 <div>
   <a href="/admin/add_service" class="btn btn-primary">Add Service</a>
 </div>
@@ -61,29 +57,38 @@
   <thead>
     <tr>
       <th scope="col">ID</th>
+      <th scope="col">Professional Name</th>
       <th scope="col">Service Name</th>
-      <th scope="col">Base Price</th>
       <th scope="col">Action</th>
     </tr>
   </thead>
   <tbody>
+    {% for professional in professionals %}
+    {% if professional.status == 0 %}
     <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
+      <!-- when we click on id , it will show all important data belongs to the professional -->
+      <th scope="row"><a href="/admin/{{user}}/{{professional.id}}/details">{{professional.id}}</a></th>
+      <td>{{professional.name}}</td>
+      <td>{{professional.services.name}}</td>
+      <!-- professional.services from backref relation. -->
+      <td><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Approve" type="button" class="btn btn-success">Approve</a><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Block" type="button" class="btn btn-danger"> Block</a></td>
     </tr>
+     
+
+    {% endif %}
+    {% endfor %}
+    <!-- when no new avalable -->
     <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
+      <th scope="row">--</th>
+      <td>No New Professional</td>
+      <td>---</td>
+      <td>---</td>
+      <!-- professional.services from backref relation. -->
+      <td><a href="/admin/{{user}}/show/all_professionals">See all professionals</a></td>
+       
     </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
-    </tr>
+
+    
   </tbody>
 </table>
 

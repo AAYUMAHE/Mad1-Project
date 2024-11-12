@@ -6,13 +6,18 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav me-auto mb-2 mb-lg-0">
         <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="/admin/{{user}}">Home</a>
+          <a class="nav-link active" aria-current="page" href="/customer/{{user}}">Home</a>
         </li>
         <li class="nav-item">
           <a class="nav-link active" aria-current="page" href="/">Logout</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="#">Summary</a>
+        </li>
+        <li class="nav-item">
+          <!-- id is uid or user id , as uid is passed as id in customer dashoard. -->
+          <a class="nav-link" href="/customer/{{id}}/{{user}}/services">Your Services</a>   
+            <!-- route line 280 approx -->
         </li>
          
       </ul>
