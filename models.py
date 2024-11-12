@@ -22,18 +22,20 @@ class Category(db.Model):
 
 class Professional(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    email = db.Column(db.String(32), unique=True)
+    email = db.Column(db.String(32), unique=True,nullable=False)
     name = db.Column(db.String(64), nullable=False)
     password = db.Column(db.String(256), nullable=False)
     description = db.Column(db.String(256), nullable=False)
-    category = db.Column(db.String(256),db.ForeignKey('category.id'), nullable=False )
+    category = db.Column(db.String(256),db.ForeignKey('category.id'), nullable=False )  #category is cid consider 
     s_id = db.Column(db.String(256),db.ForeignKey('services.id'), nullable=False )
          #see category in numbers also if possible
     # service = db.Column(db.String(256), nullable=False)
-    pdf = db.Column(db.LargeBinary, nullable=False)
+    # pdf = db.Column(db.LargeBinary, nullable=False)
     address = db.Column(db.String(64), nullable=False)
     experience = db.Column(db.String(64), nullable=False)
     pincode = db.Column(db.Integer , nullable=False)
+    status = db.Column(db.Integer , nullable=False)
+    #status code 0 when applied , 1 when accepted , 2 when blocked .
 
 
 
@@ -43,6 +45,7 @@ class Services(db.Model):
     name = db.Column(db.String(64), nullable=False)
     base_price = db.Column(db.Integer , nullable=False)
     description = db.Column(db.String(64), nullable=False)
+    professional = db.relationship("Professional", backref = 'services',cascade = "all,delete",lazy = True)
 
      
 
@@ -50,7 +53,7 @@ class Running(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     u_id = db.Column(db.Integer, db.ForeignKey('user.id') , unique=True, nullable= False)
     s_id = db.Column(db.Integer, db.ForeignKey('services.id') , nullable=False)
-    p_id = db.Column(db.Integer, db.ForeignKey('professional.id'))
+    p_id = db.Column(db.Integer, db.ForeignKey('professional.id'),default='Null')
     c_id = db.Column(db.Integer, db.ForeignKey('category.id') , nullable=False)
     date_time_created = db.Column(db.DateTime, nullable=False)
     date_time_closed = db.Column(db.DateTime, nullable=True)

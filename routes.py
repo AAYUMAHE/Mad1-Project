@@ -65,9 +65,9 @@ def signup():
             #  give the template showing confirm password is wrong or any other practice.
     return render_template('signup.html')
 
-@app.route('/professional_signup')
-def signup1p():
-    return render_template('p-signup.html')
+# @app.route('/professional_signup')
+# def signup1p():
+#     return render_template('p-signup.html')
 
 
 
@@ -75,19 +75,29 @@ def signup1p():
 #creating login to admin , customer reddirect.
 @app.route('/' , methods=['GET','POST'])
 def login():
+    msg = request.args.get('msg')  
+    #getting from parameter passing while redirecting from any other route. 260 line-no.
     if request.method == 'POST':
         uname = request.form.get('email')
         pwd = request.form.get('password')
         usr = User.query.filter_by(email = uname , password = pwd ).first()
+        professional = Professional.query.filter_by(email=uname).first()
         if usr  and usr.role == 0:
             return redirect(url_for('admin_dashboard',user=uname))
             # return render_template("admin.html",user=uname,services=get_service())  
               #it will redirect to new route . #router func or jinja var in admin.html
         elif usr and usr.role == 1:
             return  redirect(url_for('customer_dashboard',user=uname))
+        elif professional and professional.status == 1:
+            return redirect(url_for('professional_dashboard',user=uname))
+        elif professional and professional.status == 0:
+            return render_template('login.html',msg="Your Account is Under Verification")
+        elif professional and professional.status == 2:
+            return render_template('login.html',msg="You Account is blocked")
+        
         else:
             return render_template('login.html',msg="Invalid Credentials")
-    return render_template('login.html')
+    return render_template('login.html',msg=msg)
 
 
 
@@ -208,7 +218,7 @@ def customer_view(category,id,user):
 @app.route('/book/<user>/<uid>/service/<sid>',methods=['GET','POST'])
 def book_service(user,sid,uid):
     if request.method=='POST':
-        cid = Category.query.filter_by(id = sid).first().id
+        cid = Services.query.filter_by(id = sid).first().c_id
         # Set the current time in UTC+5:30 (Indian Standard Time)
         ist_timezone = pytz.timezone('Asia/Kolkata')   #indian standard time
         current_time = datetime.now(ist_timezone)
@@ -218,3 +228,37 @@ def book_service(user,sid,uid):
         return redirect(url_for('customer_dashboard',user=user))
     service = Services.query.filter_by(id = sid).first()  # give 1st obj in list.
     return render_template('book_services.html',user=user,sid=sid,id=uid,service=service)
+
+
+
+
+#professional signup.
+@app.route('/professional_signup' , methods=['GET','POST'])
+def professional_signup():
+    services = get_service() #return a list of obj of all services.
+    if request.method=='POST':
+        name = request.form.get('name')
+        email = request.form.get('email')
+        password = request.form.get('password').strip()
+        confirm_pass = request.form.get('c_password').strip()  #if any extra spaces then clear.
+        service_name = request.form.get('service')
+        address = request.form.get('address')
+        experience = request.form.get('experience')
+        description = request.form.get('description')
+        pincode = request.form.get('pincode')
+        status = 0 #by default until admin approves him.
+        if password == confirm_pass:
+            print('If qst block rendered')
+            professional = Professional.query.filter_by(email = email).first() 
+            sid = Services.query.filter_by(name=service_name).first().id  #tells sid for service name .
+            #password may be same , but professioanl must be diff.
+            cid = Services.query.filter_by(name=service_name).first().c_id #tells cid for service.
+            if professional:
+                return render_template('p-signup.html' , msg='This email id is already registered, try new one')
+            new_professional = Professional(email=email , name= name , password=password ,description=description, category = cid,s_id = sid,address=address, experience= experience,pincode=pincode  , status = status   )
+            db.session.add(new_professional)
+            db.session.commit()
+            return redirect(url_for('login' , msg="Registration Successful ,wait for admin to approve"))
+        
+    return render_template('p-signup.html',services = services)
+
