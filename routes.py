@@ -1,6 +1,9 @@
 from flask import Flask,render_template,request,url_for,redirect
 from flask import current_app as app
 from models import *
+from datetime import datetime
+import pytz
+
 
 # @app.route('/login')
 # def login():
@@ -198,7 +201,20 @@ def search(user):
 def customer_view(category,id,user):
     cid = Category.query.filter_by(name=category).first().id   #we only have one record of unique category , so first. if all then messy.
     services = get_all_services_by_cid(cid)   #list of all services related to cid or id.
-    return render_template('customer.html',services=services,user=user,category=category,header_msg='Book the service you would like to have !')
+    return render_template('customer.html',services=services,user=user,id=id,category=category,header_msg='Book the service you would like to have !')
 #important lesson , jitne attribute def func mein hoo , utne saare use hone chaye , other vise error.
 
      
+@app.route('/book/<user>/<uid>/service/<sid>',methods=['GET','POST'])
+def book_service(user,sid,uid):
+    if request.method=='POST':
+        cid = Category.query.filter_by(id = sid).first().id
+        # Set the current time in UTC+5:30 (Indian Standard Time)
+        ist_timezone = pytz.timezone('Asia/Kolkata')   #indian standard time
+        current_time = datetime.now(ist_timezone)
+        new_service_rq_added = Running(u_id=uid,s_id=sid,c_id=cid,date_time_created=current_time)
+        db.session.add(new_service_rq_added)
+        db.session.commit()
+        return redirect(url_for('customer_dashboard',user=user))
+    service = Services.query.filter_by(id = sid).first()  # give 1st obj in list.
+    return render_template('book_services.html',user=user,sid=sid,id=uid,service=service)

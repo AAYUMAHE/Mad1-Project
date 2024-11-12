@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}   
+<!-- inheritence -->
+
+{% block title %}
+             Admin
+          {% endblock %} 
+
+<div class="err_pop">{{msg}}</div>          
+
+{% block content %}
+<div>
+  <h1>Confirm your Booking {{user}}</h1>
+  <form class="input_form" action="/book/{{user}}/{{id}}/service/{{service.id}}" method="POST" >
+    <div class="mb-3">
+      <label for="name" class="form-label">Name</label>
+      <input type="text" class="form-control" name="name" id="name" value={{service.name}} readonly>
+    </div>
+    <div class="mb-3">
+      <label for="base_price" class="form-label">Base Price</label>
+      <input type="text" class="form-control" name="base_price" id="base_price" value={{service.base_price}} readonly>
+    </div>
+    <div class="mb-3">
+      <a href=""></a>
+      <button type="submit" class="btn btn-success">Confirm</button>
+    </div>
+  </form>
+</div>
+
+
+
+
+{% endblock %}

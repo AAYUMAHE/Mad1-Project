@@ -25,6 +25,7 @@
         <p class="card-text"> {{category.name}} Services </p>
       </div>
     </div>
+    <!-- id is user id -->
   {% endfor %}
      
 
@@ -46,7 +47,10 @@
           <th scope="row">{{service.id}}</th>
           <td>{{service.name}}</td>
           <td>{{service.base_price}}</td>
-           
+          <td><a href="/book/{{user}}/{{id}}/service/{{service.id}}"><button type="button" class="btn btn-success">Book</button></a></td>
+        </tr>
+        <!-- id is user id -->
+         <!-- sid is service id  -->
         {% endfor %}
          
       </tbody>
