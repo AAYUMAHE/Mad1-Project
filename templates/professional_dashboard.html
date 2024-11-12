@@ -4,7 +4,7 @@
              Professioanl
           {% endblock %}  
 
-{% include 'navbar.html' %}
+<!-- {% include 'navbar.html' %} -->
 
  {% block content %} 
  <div style="text-align: right; margin:auto;"><a href="#">Profile details</a></div>
@@ -23,29 +23,22 @@
   <thead>
     <tr>
       <th scope="col">ID</th>
-      <th scope="col">Service Name</th>
-      <th scope="col">Base Price</th>
+      <th scope="col">Customer Name</th>
+      <th scope="col">Date Time</th>
       <th scope="col">Action</th>
     </tr>
   </thead>
   <tbody>
+    {% for service in services %}
     <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
+      <th scope="row">{{service.id}}</th>
+      <td>{{service.user.name}}</td>
+      <td>{{service.date_time_created}}</td>
+      <!-- service.id belongs to running pending services -->
+      <td><a href="/professional/{{sid}}/{{user}}/accept/{{service.id}}" type="button" class="btn btn-success">Accept</a></td>
     </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
-    </tr>
+    {% endfor %}
+     
   </tbody>
 </table>
 

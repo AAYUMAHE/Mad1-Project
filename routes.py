@@ -33,6 +33,10 @@ def get_all_services_by_customer(customer_id):
     services = Running.query.filter_by(u_id = customer_id).all()  #will give list of obj services u_id is user id.
     #customer is user. 
     return services
+#services  in running by sid.
+def get_running_pending_services(sid):
+    running_services = Running.query.filter_by(s_id = sid,status='pending').all()  #all running services by sid.
+    return running_services
 
 #functions for search
 def search_by_service_name(service_name):
@@ -96,7 +100,7 @@ def login():
         elif usr and usr.role == 1:
             return  redirect(url_for('customer_dashboard',user=uname))
         elif professional and professional.status == 1:
-            return redirect(url_for('professional_dashboard',user=professional.name))
+            return redirect(url_for('professional_dashboard',user=professional.email, sid= professional.s_id))
             #professional.name is better in elif if professional is none , we saved by error.
         elif professional and professional.status == 0:
             return render_template('login.html',msg="Your Account is Under Verification")
@@ -322,7 +326,18 @@ def professional_signup():
         
     return render_template('p-signup.html',services = services)
 
-@app.route('/professional/<user>')
-def professional_dashboard(user):
-    return render_template('professional_dashboard.html',user=user)
+@app.route('/professional/<sid>/<user>')
+def professional_dashboard(user,sid):
+    services = get_running_pending_services(sid)
+    return render_template('professional_dashboard.html',user=user,services = services,sid=sid)
 
+#accepting service requests.
+#rsid is id of running pending service.
+@app.route('/professional/<sid>/<user>/accept/<rsid>')
+def accept_running_service(sid,user,rsid):
+    professional = Professional.query.filter_by(email = user).first()
+    service = Running.query.filter_by(id=rsid).first()   #give the running service by rsid .
+    service.status = 'Accepted' #accept the service.
+    service.p_id = professional.id
+    db.session.commit()
+    return redirect(url_for('professional_dashboard',user=user,sid=sid))
