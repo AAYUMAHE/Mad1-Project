@@ -1,0 +1,77 @@
+{% extends 'layout.html' %}   
+<!-- inheritence -->
+
+{% block title %}
+             Search Results
+          {% endblock %}  
+
+{% include 'navbar_customer.html' %}    
+<!-- including navbar -->
+
+ {% block content %} 
+ <div style="text-align: center; text-decoration:solid">{{msg}}</div>
+
+
+
+ <!-- this is the same template in customer.html second down block -->
+<div style="margin-top: 40px;"> 
+  
+    <table class="table table-bordered">
+      <thead>
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Service Name</th>
+          <th scope="col">Base Price</th>
+          <th scope="col">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if services %}
+        {% for service in services %}
+        
+        <tr>
+          <th scope="row">{{service.id}}</th>
+          <td>{{service.name}}</td>
+          <td>{{service.base_price}}</td>
+          <td><a href="/book/{{user}}/{{id}}/service/{{service.id}}"><button type="button" class="btn btn-success btn-sm">Book</button></a></td>
+        </tr>
+        <!-- id is user id -->
+         <!-- sid is service id  -->
+        {% endfor %}
+        {% endif %}
+
+        {% if by_address %}
+        
+        <!-- by_address returns a list of professionals who matched location . -->
+        {% for professional in by_address %}
+        <tr>
+          <th scope="row">{{professional.services.id}}</th>
+          <td>{{professional.services.name}}</td>
+          <td>{{professional.services.base_price}}</td>
+          <!-- here professional.services.id bcz we are backrederencing everything -->
+          <td><a href="/book/{{user}}/{{id}}/service/{{professional.services.id}}"><button type="button" class="btn btn-success btn-sm">Book</button></a></td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+
+        {% if by_pincode %}
+        
+        <!-- by_address returns a list of professionals who matched location . -->
+        {% for professional in by_pincode %}
+        <tr>
+          <th scope="row">{{professional.services.id}}</th>
+          <td>{{professional.services.name}}</td>
+          <td>{{professional.services.base_price}}</td>
+          <!-- here professional.services.id bcz we are backrederencing everything -->
+          <td><a href="/book/{{user}}/{{id}}/service/{{professional.services.id}}"><button type="button" class="btn btn-success btn-sm">Book</button></a></td>
+        </tr>
+        {% endfor %}
+        {% endif %}
+         
+      </tbody>
+    </table>
+ 
+</div>
+
+  
+ {% endblock %}

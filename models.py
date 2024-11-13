@@ -51,6 +51,7 @@ class Services(db.Model):
     description = db.Column(db.String(64), nullable=False)
     professional = db.relationship("Professional", backref = 'services',cascade = "all,delete",lazy = True)
     running = db.relationship("Running", backref = 'services',cascade = "all,delete",lazy = True)
+    
 
      
 

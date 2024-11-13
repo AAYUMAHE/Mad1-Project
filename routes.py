@@ -28,7 +28,7 @@ def get_all_services_by_cid(id):
     services = Services.query.filter_by(c_id = id).all()  #will gie list of services belongs to cid.
     return services
 
-#all services by customer
+#all services by customer  for customer dashboard
 def get_all_services_by_customer(customer_id):
     services = Running.query.filter_by(u_id = customer_id).all()  #will give list of obj services u_id is user id.
     #customer is user. 
@@ -37,6 +37,16 @@ def get_all_services_by_customer(customer_id):
 def get_running_pending_services(sid):
     running_services = Running.query.filter_by(s_id = sid,status='pending').all()  #all running services by sid.
     return running_services
+
+#accepted services by professional which are Active or approvved by them
+def get_accepted_services_by_professional(professional_id):
+    accepted_services = Running.query.filter_by(p_id = professional_id,status='Accepted').all()
+    #by problem statement a professional can work on 1 service until customer closes it.
+    return accepted_services
+#closed services by professional
+def get_closed_services_by_professional(professional_id):
+    closed_services = Running.query.filter_by(p_id = professional_id,status='closed').all()  #'closed' take care
+    return closed_services
 
 #functions for search
 def search_by_service_name(service_name):
@@ -47,7 +57,19 @@ def search_by_service_description(service_description):
     return by_services_description
 def search_by_category(category_name):
     by_category = Category.query.filter(Category.name.ilike(f"%{category_name}%")).all()
-    return by_category  #return a list as .all
+    return by_category  #return a list as .all , not useful for us in customer search , as it will return category but we wan to book service i.e not related to anything.
+
+def search_by_category_for_customer(category_name):
+    by_category = Category.query.filter(Category.name.ilike(f"%{category_name}%")).first() #limitation , only 1st .
+    services = by_category  # return a list of serices related to category
+    return services
+def search_by_location_for_customer(location):
+    by_location = Professional.query.filter(Professional.address.ilike(f"%{location}%")).all() #all professionals which filter location or address , then we iterate in jinja template html. to fethch accurate data.
+    return by_location
+def search_by_pincode_for_customers(pincode):
+    by_pincode = Professional.query.filter(Professional.pincode == pincode).all() 
+    #similar to location but pincode is integer so acordingly we queried
+    return by_pincode
 
 
 # services = get_service()[0].name    it will only work if services are there if no services are it will throgh out of range error.
@@ -271,11 +293,14 @@ def customer_view(category,id,user):
 def book_service(user,sid,uid):
     service = Services.query.filter_by(id = sid).first()  # give 1st obj in list.
     if request.method=='POST':
-        already_service_status = Running.query.filter_by(u_id = uid, s_id = sid,status='pending').first()
+        already_service_status = Running.query.filter_by(u_id = uid ,status='pending').first()
+        already_service_status2 = Running.query.filter_by(u_id = uid , status = 'Accepted').first()
         #it will take care that if pending is there they can't book another.
-        if already_service_status :
+        if already_service_status:
             return render_template('book_services.html',msg='You already booked one service kindly wait for acceptence',user=user,sid=sid,id=uid)
             #all these sid, user are necessary , as navbar will need or nav bar some router.
+        elif already_service_status2:
+            return render_template('book_services.html',msg='Kindly close the active service before procedding',id = uid,user = user ,sid = sid )
         cid = Services.query.filter_by(id = sid).first().c_id
         # Set the current time in UTC+5:30 (Indian Standard Time)
         ist_timezone = pytz.timezone('Asia/Kolkata')   #indian standard time
@@ -287,11 +312,84 @@ def book_service(user,sid,uid):
      
     return render_template('book_services.html',user=user,sid=sid,id=uid,service=service)
 
-
+#get details of particular customer services
 @app.route('/customer/<uid>/<user>/services',methods=['GET','POST'])
 def all_customer_services(uid,user):
-    services = get_all_services_by_customer(uid)   #uid is customer id , cid we call category id , don't confuse.
+    services = get_all_services_by_customer(uid)   # running services uid is customer id , cid we call category id , don't confuse.
     return render_template('customer_services.html',services=services,user=user,id=uid)
+
+
+#it is only rendered if customer on close it , as on other buttons , no close route is defined.
+@app.route('/customer/<id>/<user>/services/close',methods = ['GET','POST'])
+def close_service(id,user):
+    service = Running.query.filter_by(u_id=id,status = 'Accepted').first()  
+    #accepted condn is must, only accepted close.
+    if request.method == 'POST':
+        service.status = 'closed'
+        # we can 1st do rating and then service.rating change , do it directly instead
+        service.ratings = request.form.get('rating')  #rating is in str in database Running class.
+        service.remarks = request.form.get('remarks')
+        ist_timezone = pytz.timezone('Asia/Kolkata')   #indian standard time
+        current_time = datetime.now(ist_timezone)
+        service.date_time_closed = current_time
+        db.session.commit()
+        return redirect(url_for('all_customer_services',uid=id,user=user))
+        #all customer service redirect have all necessary equipments.  it need id in form of uid. 
+    return render_template('customer_remarks.html',uid = id , user = user,service =service,header= 'Your opinion matters?', action = 'close')    
+
+#revoking service .
+# id is uid dont forgot.
+@app.route('/customer/<id>/<user>/services/revoke', methods = ['GET','POST'])
+def revoke_service(id,user):
+    service = Running.query.filter_by(u_id=id,status = 'pending').first()  #only pending can revoke.
+    if request.method == 'POST':
+        service.status = 'Revoked'
+        db.session.commit()
+        return redirect(url_for('all_customer_services',uid=id,user=user))
+    return render_template('service_revoke.html',user = user , uid = id ,service=service)
+
+
+#edit a rating or remarks on closed service
+@app.route('/customer/<id>/<user>/services/edit_review',methods = ['GET','POST'])
+def edit_service_review(id,user):
+    service = Running.query.filter_by(u_id=id,status = 'closed').first()  #only closed service extract
+    if request.method == 'POST':
+        service.ratings = request.form.get('rating')  #rating is in str in database Running
+        service.remarks = request.form.get('remarks')
+        # closed time have to be same , only rating or remarks can be changed
+        db.session.commit()
+        return redirect(url_for('all_customer_services',uid=id,user=user))
+    return render_template('customer_remarks.html',user=user,uid = id, service = service ,action = 'edit_review' )
+
+
+#customer search
+@app.route('/search/customer/<user>/services/', methods = ['GET','POST'])
+def search_services_for_customer(user):
+    if request.method == 'POST' :
+        uid = User.query.filter_by(email = user).first().id   #uid is required for layout incude .
+        search_txt = request.form.get('search_txt')
+        by_services = search_by_service_name(search_txt)   #return a list of objects.
+        by_services_description = search_by_service_description(search_txt)   #return a list of objects.
+        by_categories = search_by_category_for_customer(search_txt)
+        by_pincode = search_by_pincode_for_customers(search_txt)
+        if by_categories:
+            by_categories = by_categories.services 
+            #to get rid of none type error  
+        #give serices related to category list of obj. in function category.services . look carefully,don't confuse.
+        by_address = search_by_location_for_customer(search_txt)    
+        if by_services:
+            return render_template('search_customer.html',user=user,services = by_services, id = uid)
+        elif by_services_description:
+            return render_template('search_customer.html',user=user,services = by_services_description)
+        elif by_categories:
+            return render_template('search_customer.html',user=user, services = by_categories)
+        elif by_address:
+            return render_template('search_customer.html',user=user, by_address = by_address)
+        elif by_pincode:
+            return render_template('search_customer.html',user=user, by_pincode = by_pincode)
+        else :
+            return render_template('search_customer.html',user=user, id = uid,msg = 'Nothing Found , Search again!')
+    
 
 
 
@@ -326,10 +424,15 @@ def professional_signup():
         
     return render_template('p-signup.html',services = services)
 
+
+#passing requests to dashboard
 @app.route('/professional/<sid>/<user>')
 def professional_dashboard(user,sid):
+    p_id = Professional.query.filter_by(email = user).first().id  
+    active_services = get_accepted_services_by_professional(p_id)
     services = get_running_pending_services(sid)
-    return render_template('professional_dashboard.html',user=user,services = services,sid=sid)
+    closed_services = get_closed_services_by_professional(p_id)
+    return render_template('professional_dashboard.html',user=user,services = services,sid=sid,p_id = p_id , active_services = active_services,closed_services= closed_services)
 
 #accepting service requests.
 #rsid is id of running pending service.

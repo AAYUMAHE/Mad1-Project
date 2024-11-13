@@ -1,0 +1,65 @@
+{% extends 'layout.html' %}
+
+{% block title %}
+    Service Review
+{% endblock %}
+
+{% block content %}
+<h1 style="text-align: center;">{{header}}</h1>
+
+<div class="display-1 fs-1 text center">
+  <button>{{service.services.name}}</button>
+  <button>{{service.services.description}} </button>
+  <button>{{service.date_time_created}} </button>
+</div>
+<div class="display-1 fs-1 text center">
+  <button>{{service.professional.id}} </button>
+  <button>{{service.professional.name}} </button>
+</div>
+<div>
+
+   
+
+  <form class="input_form" action="/customer/{{uid}}/{{user}}/services/{{action}}" method='POST'>
+<!-- action is passed through router , dont confuse, if we have to close service action = close , like that. -->
+    <div class="err_pop">{{msg}}</div>
+    
+    <!-- ==================rating ================== -->
+    <label for="rating">Rate us:</label>
+    <div class="rating">
+      <!-- rating value is in strings -->
+      <input type="radio" id="star1" name="rating" value="1" />
+      <label for="star1" title="1 star">☆</label>
+      <input type="radio" id="star2" name="rating" value="2" />
+      <label for="star2" title="2 stars">☆</label>
+      <input type="radio" id="star3" name="rating" value="3" />
+      <label for="star3" title="3 stars">☆</label>
+      <input type="radio" id="star4" name="rating" value="4" />
+      <label for="star4" title="4 stars">☆</label>
+      <input type="radio" id="star5" name="rating" value="5" required />
+      <label for="star5" title="5 stars">☆</label>
+       
+    </div>
+    <!-- as all name same and required so one is sent as type radio -->
+    
+
+    <div class="mb-3">
+      <label for="remarks" class="form-label">Remarks( in 10 words only)</label>
+      {% if action=='close' %}
+      <!-- if action is close , means we have nothing in db related to review so we didn't set value -->
+      <input type="text"  class="form-control" name="remarks" id="remarks" placeholder="Your Review" required> 
+      {% else %}
+      <input type="text" value={{service.remarks}} class="form-control" name="remarks" id="remarks" > 
+      {% endif %}
+    </div>
+     
+     
+    <button type="submit" class="btn btn-primary">Submit</button>
+    <a href="/customer/{{uid}}/{{user}}/services" type="button" >close</a>
+    
+  </form>
+
+</div>
+  
+ 
+{% endblock %}

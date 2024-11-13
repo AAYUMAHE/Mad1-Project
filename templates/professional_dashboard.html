@@ -3,8 +3,7 @@
 {% block title %}
              Professioanl
           {% endblock %}  
-
-<!-- {% include 'navbar.html' %} -->
+{% include 'navbar_professional.html' %}
 
  {% block content %} 
  <div style="text-align: right; margin:auto;"><a href="#">Profile details</a></div>
@@ -18,65 +17,34 @@
 </div>
 
 
-
 <table class="table table-bordered">
   <thead>
     <tr>
       <th scope="col">ID</th>
       <th scope="col">Customer Name</th>
       <th scope="col">Date Time</th>
+      <th scope="col">Address</th>
+      <th scope="col">Pincode</th>
       <th scope="col">Action</th>
     </tr>
   </thead>
   <tbody>
-    {% for service in services %}
+  
+    <!-- =====================for accepted services by Professional====================== -->
+    {% for service in active_services %}
     <tr>
       <th scope="row">{{service.id}}</th>
       <td>{{service.user.name}}</td>
-      <td>{{service.date_time_created}}</td>
+      <td>{{service.date_time_created.strftime('%Y-%m-%d %H:%M:%S')}}</td>
+      <td>{{service.user.address}}</td>
+      <td>{{service.user.pincode}}</td>
       <!-- service.id belongs to running pending services -->
-      <td><a href="/professional/{{sid}}/{{user}}/accept/{{service.id}}" type="button" class="btn btn-success">Accept</a></td>
+      <td><button type="button" class="btn btn-success btn-sm">Accepted</button></td>
     </tr>
     {% endfor %}
+
+
      
-  </tbody>
-</table>
-
-<!-- Closed Services -->
-
-<div class="container">
-  <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Closed Services</h3>
-</div>
-
-
-
-<table class="table table-bordered">
-  <thead>
-    <tr>
-      <th scope="col">ID</th>
-      <th scope="col">Service Name</th>
-      <th scope="col">Base Price</th>
-      <th scope="col">Action</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-    </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
-    </tr>
   </tbody>
 </table>
 
@@ -87,37 +55,73 @@
   <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Service Requests</h3>
 </div>
 
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Customer Name</th>
+      <th scope="col">Date Time</th>
+      <th scope="col">Address</th>
+      <th scope="col">Pincode</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for service in services %}
+    <tr>
+      <th scope="row">{{service.id}}</th>
+      <td>{{service.user.name}}</td>
+      <td>{{ service.date_time_created.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <td>{{service.user.address}}</td>
+      <td>{{service.user.pincode}}</td>
+      <!-- service.id belongs to running pending services -->
+      <td><a href="/professional/{{sid}}/{{user}}/accept/{{service.id}}" type="button" class="btn btn-success btn-sm">Accept</a></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+
+
+
+<!-- Closed Services -->
+
+<div class="container">
+  <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Closed Services</h3>
+</div>
+
+
+
 
 
 <table class="table table-bordered">
   <thead>
     <tr>
       <th scope="col">ID</th>
-      <th scope="col">Service Name</th>
-      <th scope="col">Base Price</th>
-      <th scope="col">Action</th>
+      <th scope="col">Customer Name</th>
+      <th scope="col">Date Time Requested</th>
+      <th scope="col">Date Time Closed</th>
+      <th scope="col">Address</th>
+      <th scope="col">Pincode</th>
+      <th scope="col">Status</th>
     </tr>
   </thead>
   <tbody>
+    {% for service in closed_services %}
     <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
+      <th scope="row">{{service.id}}</th>
+      <td>{{service.user.name}}</td>
+      <td>{{service.date_time_created}}</td>
+      <td>{{service.date_time_closed}}</td>
+      <td>{{service.user.address}}</td>
+      <td>{{service.user.pincode}}</td>
+      <!-- service.id belongs to running pending services -->
+      <td><button  type="button" class="btn btn-info btn-sm">Completed</button></td>
     </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
-    </tr>
+    {% endfor %}
   </tbody>
 </table>
+
+
 
 
    
