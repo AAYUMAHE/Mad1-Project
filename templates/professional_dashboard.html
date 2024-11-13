@@ -6,14 +6,15 @@
 {% include 'navbar_professional.html' %}
 
  {% block content %} 
- <div style="text-align: right; margin:auto;"><a href="#">Profile details</a></div>
- <div style="text-align: right;"><a href="#">View/Edit</a></div>
+ <!-- sid is service id in which professional related -->
+ <div style="text-align: right; margin:auto; padding-top:20px;"><a type="button" class="btn btn-info btn-sm" href="/professional/{{sid}}/{{user}}/profile">Profile-View/Edit</a></div>
+ <!-- <div style="text-align: right;"><a href="#">View/Edit</a></div> -->
   
  
  <!-- Services  -->
 
  <div class="container">
-  <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Today Services</h3>
+  <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Accepted Services</h3>
 </div>
 
 
@@ -31,6 +32,7 @@
   <tbody>
   
     <!-- =====================for accepted services by Professional====================== -->
+     {% if active_services %}
     {% for service in active_services %}
     <tr>
       <th scope="row">{{service.id}}</th>
@@ -42,6 +44,16 @@
       <td><button type="button" class="btn btn-success btn-sm">Accepted</button></td>
     </tr>
     {% endfor %}
+    {% else %}
+    <th scope="row">---</th>
+      <td>Waiting ...</td>
+      <td>---</td>
+      <td>---</td>
+      <td>---</td>
+      <!-- service.id belongs to running pending services -->
+      <td>---</td>
+       
+    {% endif %}
 
 
      
@@ -65,8 +77,11 @@
       <th scope="col">Pincode</th>
       <th scope="col">Action</th>
     </tr>
+    
   </thead>
+   
   <tbody>
+    {% if services %} 
     {% for service in services %}
     <tr>
       <th scope="row">{{service.id}}</th>
@@ -78,18 +93,26 @@
       <td><a href="/professional/{{sid}}/{{user}}/accept/{{service.id}}" type="button" class="btn btn-success btn-sm">Accept</a></td>
     </tr>
     {% endfor %}
+    {% else %}
+    <th scope="row">---</th>
+      <td>Waiting ...</td>
+      <td>---</td>
+      <td>---</td>
+      <td>---</td>
+      <!-- service.id belongs to running pending services -->
+      <td>---</td>
+       
+    {% endif %}
   </tbody>
+  
 </table>
-
-
+ 
 
 <!-- Closed Services -->
 
 <div class="container">
   <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Closed Services</h3>
 </div>
-
-
 
 
 
@@ -106,18 +129,22 @@
     </tr>
   </thead>
   <tbody>
+    {% if closed_services %}
     {% for service in closed_services %}
     <tr>
       <th scope="row">{{service.id}}</th>
       <td>{{service.user.name}}</td>
-      <td>{{service.date_time_created}}</td>
-      <td>{{service.date_time_closed}}</td>
+      <td>{{service.date_time_created.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <td>{{service.date_time_closed.strftime('%Y-%m-%d %H:%M:%S') }}</td>
       <td>{{service.user.address}}</td>
       <td>{{service.user.pincode}}</td>
       <!-- service.id belongs to running pending services -->
       <td><button  type="button" class="btn btn-info btn-sm">Completed</button></td>
     </tr>
     {% endfor %}
+    {% else %}
+    <h2>Get your first service and update us.</h2>
+    {% endif %}
   </tbody>
 </table>
 

@@ -434,6 +434,23 @@ def professional_dashboard(user,sid):
     closed_services = get_closed_services_by_professional(p_id)
     return render_template('professional_dashboard.html',user=user,services = services,sid=sid,p_id = p_id , active_services = active_services,closed_services= closed_services)
 
+#professional profile view only
+@app.route('/professional/<sid>/<user>/profile',methods = ['GET','POST'])
+def professional_profile(sid,user):
+    professional = Professional.query.filter_by(email = user).first()
+    if request.method == 'POST':
+        professional.name = request.form.get('name')
+        professional.description = request.form.get('description')
+        professional.address = request.form.get('address')
+        professional.pincode = request.form.get('pincode')
+        professional.experience = request.form.get('experience')
+        db.session.commit()
+        return redirect(url_for('professional_dashboard',sid=sid,user=user))
+    return render_template('professional_profile.html',user=user,sid=sid,professional = professional)
+
+
+
+
 #accepting service requests.
 #rsid is id of running pending service.
 @app.route('/professional/<sid>/<user>/accept/<rsid>')

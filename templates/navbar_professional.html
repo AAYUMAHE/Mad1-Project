@@ -1,6 +1,6 @@
 
 {% block content %}
-
+<!-- <div class="fixed-top"> -->
 <nav class="navbar navbar-expand-lg bg-body-tertiary">
   <div class="container-fluid">
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
@@ -22,7 +22,7 @@
       <a class="navbar-brand" href="#">Welcome {{user}}</a>
     </div>
     <!-- action = # means action is performed on the same page instead of another page ,like we want to search on admin page so it is searching on admin page only , if we define any other it have to be available on that page -->
-    <form action="/search/{{user}}" class="form-inline my-2 my-lg-0" method="POST">
+    <form action="/search/professional/{{user}}" class="form-inline my-2 my-lg-0" method="POST">
       <input class="mr-sm-2" type="search" name="search_txt" placeholder="Search">
       <!-- <button class="btn btn-outline-success my-2 my-sm-0"   type="submit">Search</button> -->
       <button type="submit">Search</button>
@@ -32,6 +32,7 @@
     
   </div>
 </nav>
+<!-- </div> -->
      
    
 
