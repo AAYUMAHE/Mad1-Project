@@ -4,8 +4,9 @@ from models import *
 from datetime import datetime
 import pytz
 from sqlalchemy import func  #important for sum , count use.
-import matplotlib   #this is must if we are using plotting , otherwise error flow up.
+# import matplotlib   #this is must if we are using plotting , otherwise error flow up.
 import matplotlib.pyplot as plt
+plt.switch_backend('agg')   #see docs
 # matplotlib.use('Agg')  # Use a non-interactive backend
 
 
@@ -598,6 +599,32 @@ def get_records_customer_summary(uid):
     return plt
 
 
+def get_records_professional_summary(pid):
+    accepted = Running.query.filter_by(p_id = pid, status = 'Accepted').all()  #it is also 1 as till closed no bookings.
+    closed = Running.query.filter_by(p_id = pid, status = 'closed').all() 
+    #list we want how many record are there belongs to uid.
+    #names look carefully as , Accepted in capital , or closed in small like
+    closed_count = len(closed)
+    accepted_count = len(accepted)
+    summary = {}
+    list_ele = ['accepted','closed']
+    for l in list_ele:
+        if l == 'accepted':
+            summary[l] = accepted_count
+        elif l == 'closed':
+            summary[l] = closed_count
+        else:
+            pass
+    x_status = list(summary.keys())
+    y_status_count = list(summary.values())
+    plt.bar(x_status,y_status_count,color = 'blue',width=0.4)
+    plt.title('Status/Records')
+    plt.xlabel('Status')
+    plt.ylabel('Records')
+    return plt
+
+
+
 @app.route('/admin/<user>/summary')
 def admin_summary(user):
     plot1 = get_services_summary_admin()
@@ -615,4 +642,13 @@ def customer_summary(uid,user):
     # plot.clf() dont use it , it will throgh error of gui user
     return render_template('customer_summary.html', user=user, id=uid)
 
-    
+
+#sid is service id for which professional registered.
+@app.route('/professional/<sid>/<user>/summary') 
+def professional_summary(sid,user):
+    pid = Professional.query.filter_by(email = user).first().id
+    plot = get_records_professional_summary(pid)
+    filename = f'static/images/professional_summary_{pid}.jpeg'  # pid is unique , sid may be same for diff professional.
+    plot.savefig(filename)
+    plot.close()
+    return render_template('professional_summary.html', user=user, pid=pid , sid= sid)
