@@ -12,6 +12,8 @@ class User(db.Model):
     address = db.Column(db.String(64), nullable=False)
     pincode = db.Column(db.Integer , nullable=False)
     role = db.Column(db.Boolean, nullable=False, default=1)
+    flag = db.Column(db.Integer,nullable = True, default = 0)  #count the number of flag points
+    status = db.Column(db.Integer , nullable=False, default = 1)  #to block status =2 , status =1 normal
     running = db.relationship("Running", backref = 'user',cascade = "all,delete",lazy = True)
 
   # consider username as email  

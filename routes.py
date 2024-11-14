@@ -3,7 +3,27 @@ from flask import current_app as app
 from models import *
 from datetime import datetime
 import pytz
+from sqlalchemy import func  #important for sum , count use.
+import matplotlib   #this is must if we are using plotting , otherwise error flow up.
+import matplotlib.pyplot as plt
+# matplotlib.use('Agg')  # Use a non-interactive backend
 
+
+# ============things to learn===========
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+# Replace the database URL with your own
+engine = create_engine("sqlite:///instance/db.sqlite3")
+
+# Create a configured "Session" class
+Session = sessionmaker(bind=engine)
+
+# Create a session instance
+session = Session()
+
+# ===============================================
+ 
 
 #services import
 def get_service():
@@ -47,7 +67,7 @@ def get_accepted_services_by_professional(professional_id):
 def get_closed_services_by_professional(professional_id):
     closed_services = Running.query.filter_by(p_id = professional_id,status='closed').all()  #'closed' take care
     return closed_services
-
+ 
 #functions for search
 def search_by_service_name(service_name):
     by_services = Services.query.filter(Services.name.ilike(f"%{service_name}%")).all()
@@ -305,6 +325,9 @@ def search(user):
     # print("GET request received")    
     return redirect(url_for('admin_dashboard',user = user))
 
+ 
+
+
 
 
 # ====================================customer stuff==============================
@@ -513,14 +536,83 @@ def search_services_for_professional(sid,user):
         if searched_services_by_location:
             return render_template('professional_dashboard.html', services_search = searched_services_by_location,user = user,sid = sid)
         elif searched_services_by_pincode:
-            print(type(search_txt))
+            # print(type(search_txt))
             return render_template('professional_dashboard.html', services_search = searched_services_by_pincode,user = user,sid = sid)
         elif searched_services_by_customer_name:
             return render_template('professional_dashboard.html', services_search = searched_services_by_customer_name,user = user,sid = sid)
         else:
             return render_template('professional_dashboard.html',user= user,sid = sid)
-
-        
-         
+ 
     return render_template('professional_dashboard.html',user=user,sid = sid)
 
+
+# ==================================Charts Stuff ==================================
+
+#support function for plot
+def get_services_summary_admin():
+    categories = get_category()  #defined fn give a list of all category objects
+    summary = {}  #as plotting need data in key , value pair
+    for cat in categories:
+        available_service_count_per_cat = len(cat.services)
+        summary[cat.name] = available_service_count_per_cat
+    x_category = list(summary.keys())
+    y_service_count = list(summary.values())
+    plt.bar(x_category,y_service_count,color = 'blue',width=0.4)
+    plt.title('Category/Services')
+    plt.xlabel('Category')
+    plt.ylabel('Services')
+    return plt
+
+
+#from running services table
+def get_records_customer_summary(uid):
+    pending = Running.query.filter_by(u_id = uid,status = 'pending').all()  #it gives always 1 as per our conditions.
+    accepted = Running.query.filter_by(u_id = uid, status = 'Accepted').all()  #it is also 1 as till closed no bookings.
+    closed = Running.query.filter_by(u_id = uid, status = 'closed').all()
+    revoked = Running.query.filter_by(u_id = uid, status = 'Revoked').all()  
+    #list we want how many record are there belongs to uid.
+    #names look carefully as , Accepted in capital , or closed in small like
+    closed_count = len(closed)
+    accepted_count = len(accepted)
+    revoked_count = len(revoked)
+    pending_count = len(pending)
+    summary = {}
+    list_ele = ['pending','accepted','closed','revoked']
+    for l in list_ele:
+        if l == 'pending':
+            summary[l] = pending_count
+        elif l == 'accepted':
+            summary[l] = accepted_count
+        elif l == 'closed':
+            summary[l] = closed_count
+        elif l == 'revoked':
+            summary[l] = revoked_count
+        else:
+            pass
+    x_status = list(summary.keys())
+    y_status_count = list(summary.values())
+    plt.bar(x_status,y_status_count,color = 'blue',width=0.4)
+    plt.title('Status/Records')
+    plt.xlabel('Status')
+    plt.ylabel('Records')
+    return plt
+
+
+@app.route('/admin/<user>/summary')
+def admin_summary(user):
+    plot1 = get_services_summary_admin()
+    plot1.savefig('static/images/category_admin_summary.jpeg')
+    plot1.close()   #it will close the plot.
+    return render_template('admin_summary.html' , user= user)
+
+@app.route('/customer/<uid>/<user>/summary')
+def customer_summary(uid,user):
+    plot = get_records_customer_summary(uid)
+    # in string {var} means var , formatted str concept
+    filename = f'static/images/customer_summary_{uid}.jpeg'  # Include uid in the filename
+    plot.savefig(filename)
+    plot.close()
+    # plot.clf() dont use it , it will throgh error of gui user
+    return render_template('customer_summary.html', user=user, id=uid)
+
+    

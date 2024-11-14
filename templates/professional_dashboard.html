@@ -138,7 +138,11 @@
       <th scope="row">{{service.id}}</th>
       <td>{{service.user.name}}</td>
       <td>{{service.date_time_created.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      {% if service.date_time_closed %}
       <td>{{service.date_time_closed.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      {% else %}
+      <td>Wait for customer to close.</td>
+      {% endif %}
       <td>{{service.user.address}}</td>
       <td>{{service.user.pincode}}</td>
       <!-- service.id belongs to running pending services -->
@@ -187,11 +191,25 @@
       <th scope="row">{{service.id}}</th>
       <td>{{service.user.name}}</td>
       <td>{{service.date_time_created.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      {% if service.date_time_closed %}
       <td>{{service.date_time_closed.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      {% else %}
+      <td>Wait for customer to close.</td>
+      {% endif %}
+      <!-- we make if condn bcz if service is not closed , it will throgh NoneType error , so make it if condn. -->
       <td>{{service.user.address}}</td>
       <td>{{service.user.pincode}}</td>
       <!-- service.id belongs to running pending services -->
+
+      <!-- make the search output button variable , depend on status. -->
+      {% if service.status =='closed' %}
       <td><button  type="button" class="btn btn-info btn-sm">Completed</button></td>
+      {% elif service.status == 'pending' %}
+      <td><a href="/professional/{{sid}}/{{user}}/accept/{{service.id}}" type="button" class="btn btn-success btn-sm">Accept</a></td>
+      <!-- he is also able to follow same route as defined in service requests -->
+      {% elif service.status == 'Accepted' %}
+      <td><button  type="button" class="btn btn-info btn-sm">Accepted</button></td>
+      {% endif %}
     </tr>
     {% endfor %}
     {% else %}

@@ -1,0 +1,57 @@
+{% extends 'layout.html' %}   
+<!-- inheritence -->
+
+{% block title %}
+             Admin
+          {% endblock %}  
+
+{% include 'navbar.html' %}    
+<!-- including navbar -->
+
+ {% block content %} 
+
+ <div class="err_pop">{{msg}}</div>
+
+ <h3 class="center" style="text-align:center; margin-top:40px; margin-bottom:40px;">Services</h3>
+ 
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Professional Category</th>
+      <th scope="col">Name</th>
+      <th scope="col">Base Price</th>
+      <th scope="col">Ratings(avg of 10)</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody>
+{% for professionals in fraudlent_professionals_list %}
+    
+{% if professional.status == 1 %}
+
+<tr>
+  <th scope="row"><a href="/admin/{{user}}/{{professional.id}}/details">{{professional.id}}</a></th>
+  <td>{{professional.name}}</td>
+  <td>{{professional.services.name}}</td>
+  <!-- professional.services from backref relation. -->
+  <td><a href="#" type="button" class="btn btn-success">Approved</a><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Block" type="button" class="btn btn-danger"> Block</a></td>
+</tr>
+{% else %}
+<tr>
+  <!-- href directs to another path -->
+  <th scope="row"><a href="/admin/{{user}}/{{professional.id}}/details">{{professional.id}}</a></th>
+  <td>{{professional.name}}</td>
+  <td>{{professional.services.name}}</td>
+  <!-- professional.services from backref relation. -->
+  <td><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Approve" type="button" class="btn btn-success">Approve</a><a href="#" type="button" class="btn btn-danger"> Blocked</a></td>
+</tr>
+
+{% endif %}
+{% endfor %}
+
+    {% endfor %}
+     
+  </tbody>
+</table>
+{% endblock %}
