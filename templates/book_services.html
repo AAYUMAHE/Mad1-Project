@@ -6,12 +6,13 @@
           {% endblock %} 
  {% include 'navbar_customer.html' %}         
 
-<div class="err_pop">{{msg}}</div>          
+<div ><h2>{{msg}}</h2></div>          
 
 {% block content %}
 <div>
   {%if service%}
-  <h1>Confirm your Booking {{user}}</h1>
+  <h1 style="margin-bottom: -20px;margin-top:30px; text-align:center;">Confirm your Booking {{user}}</h1>
+   
   <form class="input_form" action="/book/{{user}}/{{id}}/service/{{service.id}}" method="POST" >
      
     <div class="mb-3">
@@ -27,6 +28,7 @@
       <button type="submit" class="btn btn-success">Confirm</button>
     </div>
   </form>
+ 
   {% else %}
   <h1>{{msg}}</h1>
   {% endif %}

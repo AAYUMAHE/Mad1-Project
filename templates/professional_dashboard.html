@@ -9,10 +9,13 @@
  <!-- sid is service id in which professional related -->
  <div style="text-align: right; margin:auto; padding-top:20px;"><a type="button" class="btn btn-info btn-sm" href="/professional/{{sid}}/{{user}}/profile">Profile-View/Edit</a></div>
  <!-- <div style="text-align: right;"><a href="#">View/Edit</a></div> -->
+
+
+ <!-- look down for search functionalty code -->
   
  
  <!-- Services  -->
-
+ {% if active_services %}
  <div class="container">
   <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Accepted Services</h3>
 </div>
@@ -59,10 +62,10 @@
      
   </tbody>
 </table>
-
+{% endif %}
 
 <!-- Service Requests -->
-
+{% if services %} 
 <div class="container">
   <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Service Requests</h3>
 </div>
@@ -106,10 +109,10 @@
   </tbody>
   
 </table>
- 
+{% endif %}
 
 <!-- Closed Services -->
-
+{% if closed_services %}
 <div class="container">
   <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Closed Services</h3>
 </div>
@@ -143,13 +146,67 @@
     </tr>
     {% endfor %}
     {% else %}
-    <h2>Get your first service and update us.</h2>
+    <th scope="row">---</th>
+      <td>Waiting ...</td>
+      <td>---</td>
+      <td>---</td>
+      <td>---</td>
+      <!-- service.id belongs to running pending services -->
+      <td>---</td>
+       
     {% endif %}
   </tbody>
 </table>
 
+{% endif %}
 
 
+<!-- search functionality code -->
+{% if services_search %}
+<div class="container">
+  <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Results as per your search request.</h3>
+</div>
+
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Customer Name</th>
+      <th scope="col">Date Time Requested</th>
+      <th scope="col">Date Time Closed</th>
+      <th scope="col">Address</th>
+      <th scope="col">Pincode</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if services_search %}
+    {% for service in services_search  %}
+    <tr>
+      <th scope="row">{{service.id}}</th>
+      <td>{{service.user.name}}</td>
+      <td>{{service.date_time_created.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <td>{{service.date_time_closed.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      <td>{{service.user.address}}</td>
+      <td>{{service.user.pincode}}</td>
+      <!-- service.id belongs to running pending services -->
+      <td><button  type="button" class="btn btn-info btn-sm">Completed</button></td>
+    </tr>
+    {% endfor %}
+    {% else %}
+    <th scope="row">---</th>
+      <td>No Results</td>
+      <td>---</td>
+      <td>---</td>
+      <td>---</td>
+      <!-- service.id belongs to running pending services -->
+      <td>---</td>
+       
+    {% endif %}
+  </tbody>
+</table>
+{% endif %}
 
    
  {% endblock %}

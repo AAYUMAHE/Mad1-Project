@@ -72,6 +72,23 @@ def search_by_pincode_for_customers(pincode):
     return by_pincode
 
 
+#search for professional functionality
+def search_by_professional_c_name(pid,user_name):
+    professionals_running = Running.query.filter(Running.p_id == pid, Running.user.has(User.name.ilike(f"%{user_name}%"))).all()
+    services = professionals_running
+    return services
+def search_by_professional_c_location(pid,user_location):
+    professionals_running = Running.query.filter(Running.p_id == pid, Running.user.has(User.address.ilike(f"%{user_location}%"))).all()
+    services = professionals_running
+    return services   #list
+def search_by_professional_c_pincode(pid,pincode):
+    professionals_running = Running.query.filter(Running.p_id == pid, Running.user.has(User.pincode == pincode)).all()
+    services = professionals_running
+    return services
+
+    
+
+
 # services = get_service()[0].name    it will only work if services are there if no services are it will throgh out of range error.
 # print(services)
 
@@ -214,6 +231,22 @@ def add_service():
 
 
 #important learning, pls do check name is defined in html file.
+
+#add category to admin
+@app.route('/admin/add_category',methods=['GET','POST'])
+def add_category():
+    usr = User.query.filter_by(role = 0).first()  #it will give admin first record in a list, we have 1 admin only.
+    if request.method == 'POST':
+        name = request.form.get('name')             #string
+        category_name = Category.query.filter_by(name = name).first()
+        if category_name :
+            pass
+        else:
+            new_category = Category(name=name)
+            db.session.add(new_category)
+            db.session.commit()
+            return redirect(url_for('admin_dashboard', user = usr.email))
+    return render_template('add_categories.html',user = usr.email)    
  
  
 
@@ -305,6 +338,8 @@ def book_service(user,sid,uid):
         # Set the current time in UTC+5:30 (Indian Standard Time)
         ist_timezone = pytz.timezone('Asia/Kolkata')   #indian standard time
         current_time = datetime.now(ist_timezone)
+        # Get the current time in IST timezone and remove microseconds
+        current_time = datetime.now(ist_timezone).replace(microsecond=0)  
         new_service_rq_added = Running(u_id=uid,s_id=sid,c_id=cid,date_time_created=current_time)
         db.session.add(new_service_rq_added)
         db.session.commit()
@@ -331,6 +366,8 @@ def close_service(id,user):
         service.remarks = request.form.get('remarks')
         ist_timezone = pytz.timezone('Asia/Kolkata')   #indian standard time
         current_time = datetime.now(ist_timezone)
+        # Get the current time in IST timezone and remove microseconds
+        current_time = datetime.now(ist_timezone).replace(microsecond=0)
         service.date_time_closed = current_time
         db.session.commit()
         return redirect(url_for('all_customer_services',uid=id,user=user))
@@ -378,15 +415,15 @@ def search_services_for_customer(user):
         #give serices related to category list of obj. in function category.services . look carefully,don't confuse.
         by_address = search_by_location_for_customer(search_txt)    
         if by_services:
-            return render_template('search_customer.html',user=user,services = by_services, id = uid)
+            return render_template('search_customer.html',user=user,services = by_services, id = uid,msg='Best results for your search.')
         elif by_services_description:
-            return render_template('search_customer.html',user=user,services = by_services_description)
+            return render_template('search_customer.html',user=user,services = by_services_description, id = uid,msg='Best results for your search.')
         elif by_categories:
-            return render_template('search_customer.html',user=user, services = by_categories)
+            return render_template('search_customer.html',user=user, services = by_categories , id = uid,msg='Best results for your search.')
         elif by_address:
-            return render_template('search_customer.html',user=user, by_address = by_address)
+            return render_template('search_customer.html',user=user, by_address = by_address ,id = uid,msg='Best results for your search.')
         elif by_pincode:
-            return render_template('search_customer.html',user=user, by_pincode = by_pincode)
+            return render_template('search_customer.html',user=user, by_pincode = by_pincode ,id = uid,msg='Best results for your search.')
         else :
             return render_template('search_customer.html',user=user, id = uid,msg = 'Nothing Found , Search again!')
     
@@ -461,3 +498,29 @@ def accept_running_service(sid,user,rsid):
     service.p_id = professional.id
     db.session.commit()
     return redirect(url_for('professional_dashboard',user=user,sid=sid))
+
+
+#searching closed or running services by their location , pincode , customer_name
+@app.route('/search/professional/<sid>/<user>',methods=['GET','POST'])
+def search_services_for_professional(sid,user):
+    if request.method == 'POST':
+        pid = Professional.query.filter_by(email = user).first().id
+        search_txt = request.form.get('search_txt')
+        # gives all services irrespective of status , is a list.
+        searched_services_by_location = search_by_professional_c_location(pid,search_txt) #list 
+        searched_services_by_pincode = search_by_professional_c_pincode(pid,search_txt)  #list
+        searched_services_by_customer_name = search_by_professional_c_name(pid,search_txt) #list
+        if searched_services_by_location:
+            return render_template('professional_dashboard.html', services_search = searched_services_by_location,user = user,sid = sid)
+        elif searched_services_by_pincode:
+            print(type(search_txt))
+            return render_template('professional_dashboard.html', services_search = searched_services_by_pincode,user = user,sid = sid)
+        elif searched_services_by_customer_name:
+            return render_template('professional_dashboard.html', services_search = searched_services_by_customer_name,user = user,sid = sid)
+        else:
+            return render_template('professional_dashboard.html',user= user,sid = sid)
+
+        
+         
+    return render_template('professional_dashboard.html',user=user,sid = sid)
+

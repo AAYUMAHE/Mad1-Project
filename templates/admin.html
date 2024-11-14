@@ -23,6 +23,7 @@
   <thead>
     <tr>
       <th scope="col">ID</th>
+      <th scope="col">Service Category</th>
       <th scope="col">Service Name</th>
       <th scope="col">Base Price</th>
       <th scope="col">Action</th>
@@ -33,6 +34,7 @@
     
     <tr>
       <th scope="row">{{service.id}}</th>
+      <td>{{service.category.name}}</td>
       <td>{{service.name}}</td>
       <td>{{service.base_price}}</td>
       <td><a href="/edit_service/{{service.id}}/{{user}}"><button type="button">Edit</button></a><a href="/delete_service/{{service.id}}/{{user}}" type="button"><button type="button">Delete</button></a></td>
@@ -43,6 +45,7 @@
 </table>
 <div>
   <a href="/admin/add_service" class="btn btn-primary">Add Service</a>
+  <a href="/admin/add_category" class="btn btn-primary">Add Category</a>
 </div>
 
 <!-- Professionals -->

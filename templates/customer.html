@@ -12,27 +12,32 @@
 
 
 
-<div> 
+ 
   <div><h1 class="display-1 fs-1 text center">{{header_msg}}</h1></div>
+   
+   {% if categories %}  
   <div class=" d-flex justify-content-evenly" style="margin-top: 70px;">
-     
-
     <!-- if categories is given in jinja -->
     <!-- id is current user id -->
   {% for category in categories %}
     <div class="card" style="width: 12rem;">
        
-      <a href="/{{category.name}}/services/{{id}}/{{user}}"><img src="/static/images/{{category.name}}.png" class="card-img-top" ></a> 
+      <a href="/{{category.name}}/services/{{id}}/{{user}}"><img src="/static/images/{{category.name}}.png" class="card-img-top" onerror="this.onerror=null; this.src='/static/images/default.png';" ></a> 
+      <!-- onerror="this.onerror=null; this.src='/static/images/default.png';" -->
+       <!-- the above code is used to show default picture -->
       <div class="card-body">
         <p class="card-text"> {{category.name}} Services </p>
       </div>
     </div>
     <!-- id is user id -->
   {% endfor %}
+  </div>
+  {% endif %}
      
 
-<!-- if services given in jinja -->
+<!-- if services given in jinja from search or category click-->
     {% if services %}
+    <div style="margin-top: 40px;"> 
     <table class="table table-bordered">
       <thead>
         <tr>
@@ -49,17 +54,19 @@
           <th scope="row">{{service.id}}</th>
           <td>{{service.name}}</td>
           <td>{{service.base_price}}</td>
-          <td><a href="/book/{{user}}/{{id}}/service/{{service.id}}"><button type="button" class="btn btn-success">Book</button></a></td>
+          <td><a href="/book/{{user}}/{{id}}/service/{{service.id}}"><button type="button" class="btn btn-success btn-sm">Book</button></a></td>
         </tr>
         <!-- id is user id -->
          <!-- sid is service id  -->
-        {% endfor %}
-         
+          {% endfor %}
+        
       </tbody>
     </table>
-    {% endif %}
+     
   </div>
-</div>  
+    {% endif %}
+  
+   
 
 
 

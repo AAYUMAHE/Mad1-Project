@@ -16,6 +16,7 @@
         <th scope="col">ID</th>
         <th scope="col">Service Name</th>
         <th scope="col">Base Price</th>
+        <th scope="col">Location</th>
         <th scope="col">Action</th>
       </tr>
     </thead>
@@ -26,6 +27,7 @@
         <th scope="row">{{service.id}}</th>
         <td>{{service.services.name}}</td>
         <td>{{service.services.base_price}}</td>
+        <td>{{service.user.address}}</td>
         {% if service.status == 'pending' %}
         <!-- id is uid -->
         <td><button type="button" class="btn btn-info btn-sm">{{service.status}}</button><a href="/customer/{{id}}/{{user}}/services/revoke" type="button" class="btn btn-warning btn-sm">Revoke</a></td>
