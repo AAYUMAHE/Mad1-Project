@@ -36,8 +36,12 @@
         {% elif service.status == 'Revoked' %}
         <td><button type="button" class="btn btn-info btn-sm">Revoked</button></td>
 
-        {% else %}
+        {% elif service.status == 'closed' %}
         <td><button type="button" class="btn btn-info btn-sm">Closed</button><a href="/customer/{{id}}/{{user}}/services/edit_review" type="button" class="btn btn-secondary btn-sm">Edit Review</a></td>
+        {% elif service.status == 'Reported' %}
+        <td><button type="button" class="btn btn-warning btn-sm">You are flagged</button></td>
+        {% elif service.status == 'Professional NA' %}
+        <td><button type="button" class="btn btn-info btn-sm">Professional NA</button>
         {% endif %}
 
       </tr>

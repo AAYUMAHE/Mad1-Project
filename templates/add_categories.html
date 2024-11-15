@@ -10,6 +10,8 @@
 
 {% block content %} 
 <!-- <div class="err_pop">{{msg}}</div> -->
+
+<div style="text-align: center; margin-top:30px" class="err_pop">{{msg}}</div>
  
 
 <form  style="margin-top:40px;"  action="/admin/add_category" method="POST">
@@ -19,8 +21,8 @@
     <input type="text" class="form-control" name="name" id="name" required>
   </div>
    
-  <button type="submit" class="btn btn-primary">Submit</button>
-  <a href="/admin/{{user}}"><button type="button">cancel</button></a>
+  <button type="submit" class="btn btn-primary btn-sm">Submit</button>
+  <a href="/admin/{{user}}"><button type="button" class="btn btn-secondary btn-sm">cancel</button></a>
 </form>
 
 {% endblock %}

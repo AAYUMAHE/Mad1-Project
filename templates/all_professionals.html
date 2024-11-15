@@ -28,7 +28,7 @@
   <td>{{professional.name}}</td>
   <td>{{professional.services.name}}</td>
   <!-- professional.services from backref relation. -->
-  <td><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Approve" type="button" class="btn btn-success">Approve</a><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Block" type="button" class="btn btn-danger"> Block</a></td>
+  <td><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Approve" type="button" class="btn btn-success btn-sm">Approve</a><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Block" type="button" class="btn btn-danger btn-sm"> Block</a></td>
 </tr>
 {% elif professional.status == 1 %}
 
@@ -37,7 +37,7 @@
   <td>{{professional.name}}</td>
   <td>{{professional.services.name}}</td>
   <!-- professional.services from backref relation. -->
-  <td><a href="#" type="button" class="btn btn-success">Approved</a><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Block" type="button" class="btn btn-danger"> Block</a></td>
+  <td><a href="#" type="button" class="btn btn-success btn-sm">Approved</a><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Block" type="button" class="btn btn-danger btn-sm"> Block</a></td>
 </tr>
 {% else %}
 <tr>
@@ -46,7 +46,7 @@
   <td>{{professional.name}}</td>
   <td>{{professional.services.name}}</td>
   <!-- professional.services from backref relation. -->
-  <td><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Approve" type="button" class="btn btn-success">Approve</a><a href="#" type="button" class="btn btn-danger"> Blocked</a></td>
+  <td><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Approve" type="button" class="btn btn-success btn-sm">Approve</a><a href="#" type="button" class="btn btn-danger btn-sm"> Blocked</a></td>
 </tr>
 
 {% endif %}

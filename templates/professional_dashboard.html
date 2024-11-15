@@ -12,9 +12,15 @@
 
 
  <!-- look down for search functionalty code -->
+
+ {% if not (active_services or services or closed_services or reported_services or na_services or services_search) %}
+ <div style="text-align: center; margin-top:70px; padding-top:20px;">
+  <h2>Wait for your 1st customer</h2>
+ </div>
+ {% endif %}
   
  
- <!-- Services  -->
+ <!-- ACcepted Services  -->
  {% if active_services %}
  <div class="container">
   <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Accepted Services</h3>
@@ -30,6 +36,8 @@
       <th scope="col">Address</th>
       <th scope="col">Pincode</th>
       <th scope="col">Action</th>
+      <th scope="col">Not Available</th>
+      <th scope="col">Report</th>
     </tr>
   </thead>
   <tbody>
@@ -45,19 +53,12 @@
       <td>{{service.user.pincode}}</td>
       <!-- service.id belongs to running pending services -->
       <td><button type="button" class="btn btn-success btn-sm">Accepted</button></td>
+      <!-- service.id is service id for which he wanr flag. -->
+      <td><a type="button" class="btn btn-danger btn-sm" href="/professional/{{sid}}/{{user}}/na/{{service.id}}">Cancel</a></td>
+      <td><a type="button" class="btn btn-danger btn-sm" href="/professional/{{sid}}/{{user}}/customer/report/{{service.id}}">Fake Request</a></td>
     </tr>
     {% endfor %}
-    {% else %}
-    <th scope="row">---</th>
-      <td>Waiting ...</td>
-      <td>---</td>
-      <td>---</td>
-      <td>---</td>
-      <!-- service.id belongs to running pending services -->
-      <td>---</td>
-       
-    {% endif %}
-
+     {% endif %}
 
      
   </tbody>
@@ -96,16 +97,8 @@
       <td><a href="/professional/{{sid}}/{{user}}/accept/{{service.id}}" type="button" class="btn btn-success btn-sm">Accept</a></td>
     </tr>
     {% endfor %}
-    {% else %}
-    <th scope="row">---</th>
-      <td>Waiting ...</td>
-      <td>---</td>
-      <td>---</td>
-      <td>---</td>
-      <!-- service.id belongs to running pending services -->
-      <td>---</td>
-       
     {% endif %}
+     
   </tbody>
   
 </table>
@@ -149,14 +142,101 @@
       <td><button  type="button" class="btn btn-info btn-sm">Completed</button></td>
     </tr>
     {% endfor %}
-    {% else %}
-    <th scope="row">---</th>
-      <td>Waiting ...</td>
-      <td>---</td>
-      <td>---</td>
-      <td>---</td>
+     
+       
+    {% endif %}
+  </tbody>
+</table>
+
+{% endif %}
+
+{% if reported_services %}
+<div class="container">
+  <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Services Reported By You</h3>
+</div>
+
+
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Customer Name</th>
+      <th scope="col">Date Time Requested</th>
+      <th scope="col">Date Time Closed</th>
+      <th scope="col">Address</th>
+      <th scope="col">Pincode</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if reported_services %}
+    {% for service in reported_services %}
+    <tr>
+      <th scope="row">{{service.id}}</th>
+      <td>{{service.user.name}}</td>
+      <td>{{service.date_time_created.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      {% if service.date_time_closed %}
+      <td>{{service.date_time_closed.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      {% else %}
+      <td>Closed by report of not genuine.</td>
+      {% endif %}
+      <td>{{service.user.address}}</td>
+      <td>{{service.user.pincode}}</td>
       <!-- service.id belongs to running pending services -->
-      <td>---</td>
+      <td><button  type="button" class="btn btn-info btn-sm">Reported</button></td>
+    </tr>
+    {% endfor %}
+     
+       
+    {% endif %}
+  </tbody>
+</table>
+
+{% endif %}
+
+
+
+<!-- ================================Not available professional services ================== -->
+
+{% if na_services %}
+<div class="container">
+  <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Services Closed By You</h3>
+</div>
+
+
+
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Customer Name</th>
+      <th scope="col">Date Time Requested</th>
+      <th scope="col">Date Time Closed</th>
+      <th scope="col">Address</th>
+      <th scope="col">Pincode</th>
+      <th scope="col">Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% if na_services %}
+    {% for service in na_services %}
+    <tr>
+      <th scope="row">{{service.id}}</th>
+      <td>{{service.user.name}}</td>
+      <td>{{service.date_time_created.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      {% if service.date_time_closed %}
+      <td>{{service.date_time_closed.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+      {% else %}
+      <td>You are not available at that time.</td>
+      {% endif %}
+      <td>{{service.user.address}}</td>
+      <td>{{service.user.pincode}}</td>
+      <!-- service.id belongs to running pending services -->
+      <td><button  type="button" class="btn btn-info btn-sm">Closed</button></td>
+    </tr>
+    {% endfor %}
+     
        
     {% endif %}
   </tbody>
@@ -209,6 +289,10 @@
       <!-- he is also able to follow same route as defined in service requests -->
       {% elif service.status == 'Accepted' %}
       <td><button  type="button" class="btn btn-info btn-sm">Accepted</button></td>
+      {% elif service.status == 'Reported' %}
+      <td><button  type="button" class="btn btn-warning btn-sm">Reported</button></td>
+      {% elif service.status == 'Professional NA' %}
+      <td><button  type="button" class="btn btn-info btn-sm">You Closed</button></td>
       {% endif %}
     </tr>
     {% endfor %}

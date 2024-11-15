@@ -10,48 +10,55 @@
 
  {% block content %} 
 
+
+
+{% if frauds %}
  <div class="err_pop">{{msg}}</div>
 
- <h3 class="center" style="text-align:center; margin-top:40px; margin-bottom:40px;">Services</h3>
- 
-<table class="table table-bordered">
+ <h3 class="center" style="text-align:center; ">Highly Flagged Customers</h3>
+ {% endif %}
+ {% if not frauds %}
+ <div class="err_pop">{{msg}}</div>
+
+ <h3 class="center" style="text-align:center; margin-top:40px; margin-bottom:40px;">Congrats , your customers are doing great ! No frauds.</h3>
+ {% endif %}
+
+
+
+{% if frauds %}
+<table style="margin-top: 30px;" class="table table-bordered">
   <thead>
     <tr>
       <th scope="col">ID</th>
-      <th scope="col">Professional Category</th>
-      <th scope="col">Name</th>
-      <th scope="col">Base Price</th>
-      <th scope="col">Ratings(avg of 10)</th>
+       
+      <th scope="col">Customer Name</th>
+      <th scope="col">Flags</th>
+     
       <th scope="col">Action</th>
     </tr>
   </thead>
   <tbody>
-{% for professionals in fraudlent_professionals_list %}
+{% for customer in frauds %}
     
-{% if professional.status == 1 %}
+{% if customer.status == 1 %}
 
 <tr>
-  <th scope="row"><a href="/admin/{{user}}/{{professional.id}}/details">{{professional.id}}</a></th>
-  <td>{{professional.name}}</td>
-  <td>{{professional.services.name}}</td>
-  <!-- professional.services from backref relation. -->
-  <td><a href="#" type="button" class="btn btn-success">Approved</a><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Block" type="button" class="btn btn-danger"> Block</a></td>
+  <td>{{customer.id}}</td>
+  <td>{{customer.name}}</td>
+  <td>{{customer.flag}}</td>
+  <td><a href="/admin/{{user}}/fraud/{{customer.id}}/Block" type="button" class="btn btn-success btn-sm"> Block</a><button type="button" class="btn btn-danger btn-sm">Active</button></td>
 </tr>
 {% else %}
-<tr>
-  <!-- href directs to another path -->
-  <th scope="row"><a href="/admin/{{user}}/{{professional.id}}/details">{{professional.id}}</a></th>
-  <td>{{professional.name}}</td>
-  <td>{{professional.services.name}}</td>
-  <!-- professional.services from backref relation. -->
-  <td><a href="/admin/professional/manage/{{professional.id}}/{{user}}/Approve" type="button" class="btn btn-success">Approve</a><a href="#" type="button" class="btn btn-danger"> Blocked</a></td>
+<tr> 
+  <td>{{customer.id}}</td>
+  <td>{{customer.name}}</td>
+  <td>{{customer.flag}}</td>
+  <td><button type="button" class="btn btn-success btn-sm">Blocked</button><a href="/admin/{{user}}/fraud/{{customer.id}}/Approve" type="button" class="btn btn-danger btn-sm">Approve</a></td>
 </tr>
 
 {% endif %}
-{% endfor %}
-
-    {% endfor %}
-     
+{% endfor %}     
   </tbody>
 </table>
+{% endif %}
 {% endblock %}

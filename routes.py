@@ -3,7 +3,7 @@ from flask import current_app as app
 from models import *
 from datetime import datetime
 import pytz
-from sqlalchemy import func  #important for sum , count use.
+from sqlalchemy import func,desc  #important for sum , count use., decending order , or in query
 # import matplotlib   #this is must if we are using plotting , otherwise error flow up.
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')   #see docs
@@ -26,7 +26,7 @@ session = Session()
 # ===============================================
  
 
-#services import
+#services import for admin
 def get_service():
     services = Services.query.all()  #it will give a list of all services available, like S1,S2...
     return services  #give list
@@ -35,10 +35,15 @@ def get_service():
 def get_category():
     categories = Category.query.all()
     return categories  #give list
-#professionals import
+#professionals import for admin
 def get_professional():
     professionals = Professional.query.all()
     return professionals  #give list
+#for admin , get sevice requests upto last 5.
+def get_service_requests():
+    last_five_services_requests = Running.query.filter(
+    Running.status.in_(['accepted', 'pending'])).order_by(Running.id.desc()).limit(5).all()
+    return last_five_services_requests  #give list
 
 #services by id. it is not giving all sevices by cat id , pls be careful.
 def get_service_by_id(service_id):
@@ -68,6 +73,12 @@ def get_accepted_services_by_professional(professional_id):
 def get_closed_services_by_professional(professional_id):
     closed_services = Running.query.filter_by(p_id = professional_id,status='closed').all()  #'closed' take care
     return closed_services
+def get_reported_services_by_professional(professional_id):
+    reported_services = Running.query.filter_by(p_id = professional_id,status='Reported').all()
+    return reported_services
+def get_professional_na_services_by_professionals(professional_id):
+    na_services = Running.query.filter_by(p_id = professional_id,status='Professional NA').all()
+    return na_services
  
 #functions for search
 def search_by_service_name(service_name):
@@ -145,7 +156,7 @@ def signup():
 #creating login to admin , customer reddirect.
 @app.route('/' , methods=['GET','POST'])
 def login():
-    msg = request.args.get('msg')  
+    # msg = request.args.get('msg')  
     #getting from parameter passing while redirecting from any other route. 260 line-no.
     if request.method == 'POST':
         uname = request.form.get('email')
@@ -157,8 +168,10 @@ def login():
             return redirect(url_for('admin_dashboard',user=uname))
             # return render_template("admin.html",user=uname,services=get_service())  
               #it will redirect to new route . #router func or jinja var in admin.html
-        elif usr and usr.role == 1:
+        elif usr and usr.role == 1 and usr.status == 1:
             return  redirect(url_for('customer_dashboard',user=uname))
+        elif usr and usr.role == 1 and usr.status == 2:
+            return render_template('login.html',msg = 'You are blocked')
         elif professional and professional.status == 1:
             return redirect(url_for('professional_dashboard',user=professional.email, sid= professional.s_id))
             #professional.name is better in elif if professional is none , we saved by error.
@@ -169,7 +182,7 @@ def login():
         
         else:
             return render_template('login.html',msg="Invalid Credentials")
-    return render_template('login.html',msg=msg)
+    return render_template('login.html' )
 
 
 
@@ -179,11 +192,12 @@ def login():
 # #Common Route for admin , name is the admin email or username.
 @app.route('/admin/<user>' , methods=['GET','POST'])
 def admin_dashboard(user):
-    return render_template('admin.html',user=user,services= get_service(),professionals = get_professional())   
+    return render_template('admin.html',user=user,services= get_service(),professionals = get_professional(),)   
     #yaha services explicitly mention krna pada kyu ki upr vala router mein only name hain.
 
 #admin professional
 # pid is professional id 
+# for block or unblock
 @app.route('/admin/professional/manage/<pid>/<user>/<value>',methods = ['GET','POST'])
 # value is Approve or Block kinda constant.
 def manage_professional(pid,user,value):
@@ -211,6 +225,68 @@ def show_all_professionals(user):
 def show_professional_details(user,pid):
     professional = Professional.query.filter_by(id = pid).first()  #professional object related to pid.
     return render_template('particular_professional_details.html',professional = professional,user=user)
+
+@app.route('/admin/<user>/show/all_customers')
+def show_all_customers(user):
+    users = User.query.all() #list of all users available in db
+    return render_template('all_users_nd_category.html',users = users,user = user)
+
+# can block unblock customers    
+@app.route('/admin/<user>/show/all_customers/<uid>/<value>' )    
+#value is block or unblock according to redirect in all_users.html
+def manage_user(user,value,uid):
+    value = value
+    user1 = User.query.filter_by(id = uid).first() #user of uid
+    if  value == 'Block':
+        user1.status = 2
+        db.session.commit()
+        return redirect(url_for('show_all_customers',user = user))
+    elif value == 'Unblock':
+        user1.status = 1
+        db.session.commit()
+        return redirect(url_for('show_all_customers',user = user))
+    else:
+        pass
+
+#see all categories , user is admin email
+@app.route('/admin/<user>/show/categories')    
+def show_categories(user):
+    categories = Category.query.all()
+    return render_template('all_users_nd_category.html',categories = categories,user=user)
+
+#delete categories
+@app.route('/admin/<user>/delete/category/<cid>')
+# cid is categotry id
+def delete_category(user,cid):
+    category = Category.query.filter_by(id = cid).first()
+    db.session.delete(category)
+    db.session.commit()
+    return redirect(url_for('show_categories',user = user))
+
+#fraudlents  customers 
+@app.route('/admin/<user>/show/frauds')
+def show_frauds_customers(user):
+    frauds = User.query.filter( (User.flag >= 5)).all()   #it will give a list.
+    return render_template('fraudlent_admin_block.html',frauds = frauds,user=user)
+
+#making block or approve to frauds
+@app.route('/admin/<user>/fraud/<cid>/<value>')
+#value is block or approve according to redirect in fraudlent_admin_block.html
+def manage_frauds(user,value,cid):
+    value = value
+    user1 = User.query.filter_by(id = cid).first() #user of uid
+    if  value == 'Block':
+        user1.status = 2
+        db.session.commit()
+        return redirect(url_for('show_frauds_customers',user = user))
+    elif value == 'Approve':
+        user1.status = 1
+        db.session.commit()
+        return redirect(url_for('show_frauds_customers',user = user))
+    else:
+        pass
+
+
 
 
 
@@ -261,7 +337,7 @@ def add_category():
         name = request.form.get('name')             #string
         category_name = Category.query.filter_by(name = name).first()
         if category_name :
-            pass
+            return render_template('add_categories.html' , user = usr.email, msg = 'Already Exists')
         else:
             new_category = Category(name=name)
             db.session.add(new_category)
@@ -342,7 +418,10 @@ def search(user):
 def customer_view(category,id,user):
     cid = Category.query.filter_by(name=category).first().id   #we only have one record of unique category , so first. if all then messy.
     services = get_all_services_by_cid(cid)   #list of all services related to cid or id.
-    return render_template('customer.html',services=services,user=user,id=id,category=category,header_msg='Book the service you would like to have !')
+    if services:
+        return render_template('customer.html',services=services,user=user,id=id,category=category,header_msg='Book the service you would like to have !')
+    else:
+        return render_template('customer.html',user=user,id=id,category=category,header_msg='We are updating services , thanks for patience')
 #important lesson , jitne attribute def func mein hoo , utne saare use hone chaye , other vise error.
 
      
@@ -491,9 +570,11 @@ def professional_signup():
 def professional_dashboard(user,sid):
     p_id = Professional.query.filter_by(email = user).first().id  
     active_services = get_accepted_services_by_professional(p_id)
-    services = get_running_pending_services(sid)
+    services = get_running_pending_services(sid)   #sid is service foe which professional registered.
     closed_services = get_closed_services_by_professional(p_id)
-    return render_template('professional_dashboard.html',user=user,services = services,sid=sid,p_id = p_id , active_services = active_services,closed_services= closed_services)
+    reported_services = get_reported_services_by_professional(p_id)
+    na_services = get_professional_na_services_by_professionals(p_id)
+    return render_template('professional_dashboard.html',user=user,services = services,sid=sid,p_id = p_id , active_services = active_services,closed_services= closed_services,reported_services = reported_services,na_services = na_services)
 
 #professional profile view only
 @app.route('/professional/<sid>/<user>/profile',methods = ['GET','POST'])
@@ -522,6 +603,45 @@ def accept_running_service(sid,user,rsid):
     service.p_id = professional.id
     db.session.commit()
     return redirect(url_for('professional_dashboard',user=user,sid=sid))
+
+
+#reporting a customer after accceptingg a customer request so professional is able to close it in case of fraud.
+@app.route('/professional/<sid>/<user>/customer/report/<rsid>',methods = ['GET','POST'])
+def report_customer(sid,user,rsid):
+    pid = Professional.query.filter_by(email = user).first().id
+    service = Running.query.filter_by(id=rsid,p_id = pid).first()  #return 1st service of rsid which is 1st only.
+    u_id = service.u_id  #user who requested service
+    flag_user = User.query.filter_by(id = u_id).first()   #give the user who is requested
+    if request.method == 'POST':
+        flag_user.flag += 1
+        # ========================
+        ist_timezone = pytz.timezone('Asia/Kolkata')   #indian standard time
+        current_time = datetime.now(ist_timezone)
+        # Get the current time in IST timezone and remove microseconds
+        current_time = datetime.now(ist_timezone).replace(microsecond=0)   #rime when reported
+        # ===============service na time==========
+        service.date_time_closed = current_time
+        service.status = 'Reported'
+        db.session.commit()
+        return redirect(url_for('professional_dashboard',user = user,sid = sid))
+    return render_template('professional_c_flag.html',sid = sid , user = user ,rsid = rsid)
+
+#cancelling a service if professional is bg.  it will not render anything
+@app.route('/professional/<sid>/<user>/na/<rsid>')
+def cancel_accepted_service(sid,user,rsid):
+    pid = Professional.query.filter_by(email = user).first().id
+    service = Running.query.filter_by(id=rsid,p_id = pid).first()
+    # ========================
+    ist_timezone = pytz.timezone('Asia/Kolkata')   #indian standard time
+    current_time = datetime.now(ist_timezone)
+    # Get the current time in IST timezone and remove microseconds
+    current_time = datetime.now(ist_timezone).replace(microsecond=0)  
+    # ===============service na time==========
+    service.date_time_closed = current_time
+    service.status = 'Professional NA'
+    db.session.commit()
+    return redirect(url_for('professional_dashboard',user = user,sid = sid))
+
 
 
 #searching closed or running services by their location , pincode , customer_name

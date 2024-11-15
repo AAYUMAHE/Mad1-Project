@@ -1,0 +1,66 @@
+{% extends 'layout.html' %}   
+<!-- inheritence -->
+
+{% block title %}
+             All Customers
+          {% endblock %}  
+
+{% include 'navbar.html' %}          
+
+{% block content %}   
+
+<div style="margin-top: 70px;"> 
+  {% if users %} 
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">User Name</th>
+      <th scope="col">User Flags</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody> 
+     
+{% for user1 in users %}
+<tr>
+  <td>{{ user1.id }}</td>
+  <td>{{ user1.name }}</td>
+  <td>{{ user1.flag }}</td>
+  {% if user1.status == 1 %}
+  <!-- user1 and user is diff -->
+  <td></button><a href="/admin/{{user}}/show/all_customers/{{user1.id}}/Block" type="button" class="btn btn-danger btn-sm">Block</a></td>
+  {% elif user1.status == 2 %}
+  <td><a href="/admin/{{user}}/show/all_customers/{{user1.id}}/Unblock" type="button" class="btn btn-success btn-sm">Unblock</a>
+  {% endif %}
+</tr>
+{% endfor %}
+ 
+
+</tbody>
+</table>
+{% endif %}
+
+
+{% if categories %}
+<table class="table table-bordered">
+  <thead>
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">Category Name</th>
+      <th scope="col">Action</th>
+    </tr>
+  </thead>
+  <tbody> 
+{% for category in categories %}
+<tr>
+  <td>{{ category.id }}</td>
+  <td>{{ category.name }}</td>
+  <td><a href="/admin/{{user}}/delete/category/{{category.id}}" type="button" class="btn btn-danger btn-sm">Delete in 1 click</a></td>
+</tr>
+{% endfor %} 
+</tbody>
+</table>
+{% endif %}
+</div>
+{% endblock %}

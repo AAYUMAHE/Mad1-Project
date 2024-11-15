@@ -18,6 +18,7 @@
 
   
 <h3 class="center" style="text-align:center; margin-top:40px; margin-bottom:40px;">Services</h3>
+<div class="main" style="margin: auto;">
  
 <table class="table table-bordered">
   <thead>
@@ -37,7 +38,7 @@
       <td>{{service.category.name}}</td>
       <td>{{service.name}}</td>
       <td>{{service.base_price}}</td>
-      <td><a href="/edit_service/{{service.id}}/{{user}}"><button type="button">Edit</button></a><a href="/delete_service/{{service.id}}/{{user}}" type="button"><button type="button">Delete</button></a></td>
+      <td><a href="/edit_service/{{service.id}}/{{user}}"><button type="button" class="btn btn-info btn-sm">Edit</button></a><a href="/delete_service/{{service.id}}/{{user}}" type="button"><button type="button" class="btn btn-danger btn-sm">Delete</button></a></td>
     </tr>
     {% endfor %}
      
@@ -98,11 +99,10 @@
 
 <!-- Service Requests -->
 
+{% if last_service_requests %}
 <div class="container">
   <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Service Requests</h3>
 </div>
-
-
 
 <table class="table table-bordered">
   <thead>
@@ -114,25 +114,23 @@
     </tr>
   </thead>
   <tbody>
+    {% for service in last_service_requests %}
     <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
+      <th scope="row">{{service.id}}</th>
+      {% if service.p_id %}
+      <td>{{service.professional.name}}</td>
+      {% else %}
+      <td>All professionals are informed</td>
+      {% endif %}
+      <td>(({{service.user.name}}))</td>
+      <td><button type="button" class="btn btn-info btn-sm">{{service.status}}</button></td>
     </tr>
-    <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-    </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td colspan="2">Larry the Bird</td>
-      <td>@twitter</td>
-    </tr>
+    {% endfor %}
+     
   </tbody>
 </table>
+{% endif %}
+</div>
 
 
    
