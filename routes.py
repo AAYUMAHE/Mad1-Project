@@ -14,14 +14,14 @@ plt.switch_backend('agg')   #see docs
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-# Replace the database URL with your own
-engine = create_engine("sqlite:///instance/db.sqlite3")
+# # Replace the database URL with your own
+# engine = create_engine("sqlite:///instance/db.sqlite3")
 
-# Create a configured "Session" class
-Session = sessionmaker(bind=engine)
+# # Create a configured "Session" class
+# Session = sessionmaker(bind=engine)
 
-# Create a session instance
-session = Session()
+# # Create a session instance
+# session = Session()
 
 # ===============================================
  
@@ -156,7 +156,10 @@ def signup():
 #creating login to admin , customer reddirect.
 @app.route('/' , methods=['GET','POST'])
 def login():
-    # msg = request.args.get('msg')  
+    msg = request.args.get('msg') 
+    if not msg:
+        msg = msg
+         
     #getting from parameter passing while redirecting from any other route. 260 line-no.
     if request.method == 'POST':
         uname = request.form.get('email')
@@ -228,7 +231,7 @@ def show_professional_details(user,pid):
 
 @app.route('/admin/<user>/show/all_customers')
 def show_all_customers(user):
-    users = User.query.all() #list of all users available in db
+    users = User.query.filter_by(role=1).all() #list of all users available in db except admin
     return render_template('all_users_nd_category.html',users = users,user = user)
 
 # can block unblock customers    
@@ -538,6 +541,7 @@ def search_services_for_customer(user):
 @app.route('/professional_signup' , methods=['GET','POST'])
 def professional_signup():
     services = get_service() #return a list of obj of all services.
+    
     if request.method=='POST':
         name = request.form.get('name')
         email = request.form.get('email')
@@ -549,7 +553,11 @@ def professional_signup():
         description = request.form.get('description')
         pincode = request.form.get('pincode')
         status = 0 #by default until admin approves him.
-        if password == confirm_pass:
+
+        users = User.query.filter_by(email = email).first()
+        if users:
+            return render_template('p-signup.html',services = services,msg = 'Email id is already registered')
+        elif password == confirm_pass:
             print('If qst block rendered')
             professional = Professional.query.filter_by(email = email).first() 
             sid = Services.query.filter_by(name=service_name).first().id  #tells sid for service name .
@@ -662,7 +670,7 @@ def search_services_for_professional(sid,user):
         elif searched_services_by_customer_name:
             return render_template('professional_dashboard.html', services_search = searched_services_by_customer_name,user = user,sid = sid)
         else:
-            return render_template('professional_dashboard.html',user= user,sid = sid)
+            return render_template('professional_dashboard.html',user= user,sid = sid,msg = 'Nothing Found search again or go to home page.')
  
     return render_template('professional_dashboard.html',user=user,sid = sid)
 
@@ -727,11 +735,11 @@ def get_records_professional_summary(pid):
     closed_count = len(closed)
     accepted_count = len(accepted)
     summary = {}
-    list_ele = ['accepted','closed']
+    list_ele = ['accepted','completed']
     for l in list_ele:
         if l == 'accepted':
             summary[l] = accepted_count
-        elif l == 'closed':
+        elif l == 'completed':
             summary[l] = closed_count
         else:
             pass

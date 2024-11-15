@@ -13,7 +13,8 @@
 
  <!-- look down for search functionalty code -->
 
- {% if not (active_services or services or closed_services or reported_services or na_services or services_search) %}
+ {% if not (active_services or services or closed_services or reported_services or na_services or services_search or msg) %}
+ <!-- msg is if message is also not passed  -->
  <div style="text-align: center; margin-top:70px; padding-top:20px;">
   <h2>Wait for your 1st customer</h2>
  </div>
@@ -246,6 +247,11 @@
 
 
 <!-- search functionality code -->
+<!-- msg is explicitly for search -->
+ {% if msg %}
+ <div style="text-align: center; margin-top:40px"><h3>{{msg}} </h3> </div>
+ {% endif %}
+
 {% if services_search %}
 <div class="container">
   <h3 class="center" style="margin-top:40px; margin-bottom:40px;">Results as per your search request.</h3>

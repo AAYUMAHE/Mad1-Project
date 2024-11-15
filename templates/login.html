@@ -6,8 +6,10 @@
 
 {% block content %}
 <div>
+  
 
   <h1 style="text-align: center;">A to Z Household Services</h1>
+  <div style="margin-top: 20px; text-align:center"><h4 style="color:blueviolet;">Welcome User, Enter your credentials to continue.</h4></div>
 
   <form class="input_form" action="/" method='POST']>
 
@@ -24,10 +26,11 @@
     </div>
      
     <button type="submit" class="btn btn-primary">Login</button>
-    <div><a href="/signup">Create Account?</a>  ||or||  <a href="/professional_signup">Register As Professional</a></div>
+    <div><a style="text-decoration: none;" href="/signup">Create Account?</a>  or  <a style="text-decoration: none;" href="/professional_signup">Register As Professional?</a></div>
   </form>
 
 </div>
+ 
   
  
 {% endblock %}
